@@ -12,7 +12,7 @@ public class GameStateManager {
 	
 	private Stack<GameState> gameStates;
 	
-	public static final int PLAY = 912837;
+	public static final int PLAY = 1;
 	
 	public GameStateManager(Game game) {
 		this.game = game;

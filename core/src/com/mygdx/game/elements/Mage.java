@@ -1,7 +1,14 @@
 package com.mygdx.game.elements;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 public class Mage extends Character {
 
+	public Mage (int x, int y) {
+		super(x, y);
+	}
+	
 	@Override
 	public void attack() {
 		// TODO Auto-generated method stub
@@ -19,5 +26,4 @@ public class Mage extends Character {
 		// TODO Auto-generated method stub
 		
 	}
-
 }

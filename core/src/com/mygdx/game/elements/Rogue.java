@@ -1,6 +1,14 @@
 package com.mygdx.game.elements;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 public class Rogue extends Character {
+
+	public Rogue(int x, int y) {
+		super(x, y);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public void attack() {

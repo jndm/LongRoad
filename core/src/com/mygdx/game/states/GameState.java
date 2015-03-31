@@ -1,5 +1,6 @@
 package com.mygdx.game.states;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Game;
@@ -9,6 +10,7 @@ public abstract class GameState {
 	
 	protected GameStateManager gsm;
 	protected Game game;
+	protected AssetManager assets;
 	
 	protected SpriteBatch sb;
 	protected OrthographicCamera cam;
@@ -20,6 +22,7 @@ public abstract class GameState {
 		sb = game.getSpriteBatch();
 		cam = game.getCamera();
 		hudCam = game.getHUDCamera();
+		assets = game.getAssetManger();
 	}
 	
 	public abstract void handleInput();
@@ -28,12 +31,3 @@ public abstract class GameState {
 	public abstract void dispose();
 	
 }
-
-
-
-
-
-
-
-
-

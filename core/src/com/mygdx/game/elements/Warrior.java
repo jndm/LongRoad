@@ -1,6 +1,12 @@
 package com.mygdx.game.elements;
 
+
 public class Warrior extends Character {
+
+	public Warrior(int x, int y) {
+		super(x, y);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public void attack() {
