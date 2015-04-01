@@ -12,6 +12,7 @@ public class Game implements ApplicationListener {
 	public static final String TITLE = "Longroad";
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 480;
+	public static final int WORLD_WIDTH = 40000;
 	
 	public static final float STEP = 1 / 60f;
 	private float accum;

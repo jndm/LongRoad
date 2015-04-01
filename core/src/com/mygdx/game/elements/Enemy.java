@@ -3,22 +3,19 @@ package com.mygdx.game.elements;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 
-
-public abstract class Character {
-	
+public abstract class Enemy {
+	private float hp;
 	private Texture texture;
 	private TextureRegion[] textureReg;
-	private Array<Equipment> equipment;
 	private float x, y;
-	private final float SPEED = 100;
-	private int hp;
 	
-	public Character(int x, int y) {
+	public Enemy(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public Enemy(){}
 	
 	public void render(SpriteBatch sb){
 		sb.begin();
@@ -26,8 +23,10 @@ public abstract class Character {
 		sb.end();
 	}
 	
-	public void move(float dt){
-		x += SPEED * dt;
+	public void render(SpriteBatch sb, int _x, int _y){
+		sb.begin();
+		sb.draw(texture, _x, _y);
+		sb.end();
 	}
 	
 	public abstract void attack();
@@ -38,4 +37,8 @@ public abstract class Character {
 	public Texture getTexture() { return texture; }
 	public float getX() { return x; }
 	public float getY() { return y; }
+	public void setX(int x) { this.x = x; }
+	public void setY(int y) { this.y = y; }
+	public void setHp(float hp) { this.hp = hp; }
+	public float getHp() { return hp; }
 }
