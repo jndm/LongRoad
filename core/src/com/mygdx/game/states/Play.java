@@ -1,5 +1,7 @@
 package com.mygdx.game.states;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
@@ -20,6 +22,7 @@ public class Play extends GameState {
 	private BitmapFont font = new BitmapFont();
 	private AssetManager assetManager;
 	private Texture bg;
+	private Texture window;
 	
 	private Warrior warrior;
 	private Mage mage;
@@ -28,12 +31,13 @@ public class Play extends GameState {
 	private Array<Array<Enemy>> enemywaves;
 	
 	private long startTime;
-	private final int ENEMYWAWES = 50;
+	private int ENEMYWAWES = 50;
 	private final int ENEMYSPAWNRANGE = Game.WORLD_WIDTH / ENEMYWAWES;
 	private final float ENEMYHPMULTIPLIER = 0.15f;
 	private int enemiesDrawn = 0;
 	
 	private final String BACKGROUND_IMG = "background/background.png";
+	private final String WINDOW_IMG = "background/window.png";
 	private final String WARRIOR_IMG = "characters/warrior.png";
 	private final String MAGE_IMG = "characters/mage.png";
 	private final String ROGUE_IMG = "characters/rogue.png";
@@ -47,9 +51,11 @@ public class Play extends GameState {
 		assets.load(MAGE_IMG, Texture.class);
 		assets.load(ROGUE_IMG, Texture.class);
 		assets.load(SKELETON_IMG, Texture.class);
+		assets.load(WINDOW_IMG, Texture.class);
 		assets.finishLoading();
 		
 		bg = assets.get(BACKGROUND_IMG);
+		window = assets.get(WINDOW_IMG);
 		
 		warrior = new Warrior(100, 80);
 		mage = new Mage(20, 150);
@@ -57,8 +63,8 @@ public class Play extends GameState {
 			
 		enemywaves = new Array<Array<Enemy>>();
 		
-		//Raffling enemywave sizes NEEDS ABSOLUTE REFACTORING
-		for(int i=0; i < ENEMYWAWES + 1; i++) {
+		//Raffling enemywave sizes NEEDS REFACTORING
+		for(int i=0; i < ENEMYWAWES; i++) {
 			Skeleton s;
 			enemies = new Array<Enemy>();
 			if(i < 17) { 
@@ -95,6 +101,8 @@ public class Play extends GameState {
 			enemywaves.add(enemies);
 		}
 		
+		enemies.clear();
+		
 		warrior.setTexture((Texture)assets.get(WARRIOR_IMG));
 		mage.setTexture((Texture)assets.get(MAGE_IMG));
 		rogue.setTexture((Texture)assets.get(ROGUE_IMG));
@@ -110,9 +118,18 @@ public class Play extends GameState {
 		System.out.println(warrior.getX());
 		mage.move(dt);
 		rogue.move(dt);
+		
+		if(enemywaves.first().get(0).getX() - warrior.getX() < 200) {
+			gsm.pushBattleState(GameStateManager.BATTLE, enemywaves.first());
+			enemywaves.removeIndex(0);
+			ENEMYWAWES--;
+		}
+		
+		/* For testing how long it takes player to reach end of the level
 		if(warrior.getX() > Game.WORLD_WIDTH) {
 			System.out.println("Time elapsed: " + (System.currentTimeMillis() - startTime)/1000+"s" );
 		}
+		*/
 	}
 	
 	public void render() {
@@ -124,8 +141,12 @@ public class Play extends GameState {
 		//BG
 		sb.setProjectionMatrix(cam.combined);
 		sb.begin();
-			for( int i=0; i < 51; i++ ) {
+			for(int i=0; i < 51; i++) {
 				sb.draw(bg, -800 + i*800, 0);
+			}
+			
+			for(int i=0; i<100; i++){
+				sb.draw(window, 400 + i*400, 350);
 			}
 		sb.end();
 		
@@ -134,7 +155,7 @@ public class Play extends GameState {
 		warrior.render(sb);
 		rogue.render(sb);
 		
-		//Have to check how to only draw when visible
+		//TODO: Have to check how to only draw when visible
 		for (int i=0; i < ENEMYWAWES; i++) {
 			for(int j=0; j < enemywaves.get(i).size; j++) {
 				enemywaves.get(i).get(j).render(sb);
@@ -154,6 +175,7 @@ public class Play extends GameState {
 		assets.unload(WARRIOR_IMG);
 		assets.unload(MAGE_IMG);
 		assets.unload(ROGUE_IMG);
+		assets.unload(SKELETON_IMG);
 	}
 	
 }

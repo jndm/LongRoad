@@ -15,7 +15,6 @@ public class Game implements ApplicationListener {
 	public static final int WORLD_WIDTH = 40000;
 	
 	public static final float STEP = 1 / 60f;
-	private float accum;
 	
 	private SpriteBatch sb;
 	private OrthographicCamera cam;

@@ -2,9 +2,12 @@ package com.mygdx.game.handlers;
 
 import java.util.Stack;
 
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
+import com.mygdx.game.states.Battle;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.Play;
+import com.mygdx.game.elements.Enemy;
 
 public class GameStateManager {
 	
@@ -13,6 +16,7 @@ public class GameStateManager {
 	private Stack<GameState> gameStates;
 	
 	public static final int PLAY = 1;
+	public static final int BATTLE = 2;
 	
 	public GameStateManager(Game game) {
 		this.game = game;
@@ -32,12 +36,17 @@ public class GameStateManager {
 	
 	private GameState getState(int state) {
 		if(state == PLAY) return new Play(this);
+		if(state == BATTLE) return new Battle(this);
 		return null;
 	}
 	
 	public void setState(int state) {
 		popState();
 		pushState(state);
+	}
+	
+	public void pushBattleState(int state, Array<Enemy> enemies) {
+		gameStates.push(new Battle(this, enemies));
 	}
 	
 	public void pushState(int state) {
