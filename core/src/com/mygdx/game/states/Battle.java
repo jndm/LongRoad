@@ -17,6 +17,7 @@ import com.mygdx.game.elements.Warrior;
 import com.mygdx.game.handlers.GameStateManager;
 import com.mygdx.game.helpers.Button;
 import com.mygdx.game.helpers.ButtonAction;
+import com.mygdx.game.elements.Character;
 
 public class Battle extends GameState {
 	
@@ -55,7 +56,7 @@ public class Battle extends GameState {
 		super(gsm);
 	}
 
-	public Battle(GameStateManager gsm, Array<Enemy> enemies) {
+	public Battle(GameStateManager gsm, Array<Enemy> enemies, Array<Character> chars) {
 		super(gsm);	
 		this.enemies = enemies;
 		
@@ -70,16 +71,15 @@ public class Battle extends GameState {
 		
 		initButtons();
 		
-		warrior = new Warrior(100, 250);
-		mage = new Mage(20, 300);
-		rogue = new Rogue(20, 228);
-		warrior.setTexture((Texture)assets.get(WARRIOR_IMG));
-		mage.setTexture((Texture)assets.get(MAGE_IMG));
-		rogue.setTexture((Texture)assets.get(ROGUE_IMG));
-		
-		for(Enemy e : enemies){
-			e.setTexture((Texture)assets.get(SKELETON_IMG));
-		}
+		mage = (Mage) chars.get(0);
+		mage.setX(20);
+		mage.setY(300);
+		warrior = (Warrior) chars.get(1);
+		warrior.setX(100);
+		warrior.setY(250);
+		rogue = (Rogue) chars.get(2);
+		rogue.setX(20);
+		rogue.setY(228);
 	}
 
 	@Override
@@ -199,6 +199,7 @@ public class Battle extends GameState {
 		assets.unload(CLICKEDBUTTONS_IMG);
 		assets.unload(ATTACKBUTTON_IMG);
 		assets.unload(CLICKEDATTACKBUTTON_IMG);
+		font.dispose();
 	}
 	
 	private void initButtons() {
@@ -208,14 +209,16 @@ public class Battle extends GameState {
 		buttonsRegion = TextureRegion.split((Texture)assets.get(BUTTONS_IMG), 400, 104);
 		clickedButtonRegion = TextureRegion.split((Texture)assets.get(CLICKEDBUTTONS_IMG), 400, 104);
 		
-		//Creating button objects, k is for keeping number of buttons combined updated.
+		//Creating button objects, k is for keeping number of buttons combined updated for setting action values
 		int k=0;
 		for(int i=0; i<BUTTON_ROWS; i++) {
 			for(int j=0; j<BUTTON_COLS; j++) {
 				mainButtons.add(new Button(j * buttonsRegion[i][j].getRegionWidth(), 
 						buttonsRegion[i][j].getRegionHeight() - i * buttonsRegion[i][j].getRegionHeight(), 
 						buttonsRegion[i][j].getRegionWidth(), 
-						buttonsRegion[i][j].getRegionHeight(), ButtonAction.values()[k]));
+						buttonsRegion[i][j].getRegionHeight(),
+						ButtonAction.values()[k].toString(),
+						ButtonAction.values()[k]));
 				TextureRegion[] tmp = new TextureRegion[2];
 				tmp[0] = buttonsRegion[i][j];
 				tmp[1] = clickedButtonRegion[i][j];
@@ -231,7 +234,9 @@ public class Battle extends GameState {
 			attackButtons.add(new Button(mainButtons.get(0).getWidth()/2, 
 					attackButtonRegion[i][0].getRegionHeight() - i * attackButtonRegion[i][0].getRegionHeight() + mainButtons.get(0).getY() + mainButtons.get(0).getWidth()/3, 
 					attackButtonRegion[i][0].getRegionWidth(), 
-					attackButtonRegion[i][0].getRegionHeight(), ButtonAction.values()[k]));
+					attackButtonRegion[i][0].getRegionHeight(), 
+					ButtonAction.values()[k].toString(),
+					ButtonAction.values()[k]));
 			TextureRegion[] tmp = new TextureRegion[2];
 			tmp[0] = attackButtonRegion[i][0];
 			tmp[1] = clickedAttackButtonRegion[i][0];

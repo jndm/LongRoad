@@ -1,5 +1,6 @@
 package com.mygdx.game.helpers;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Game;
@@ -14,13 +15,17 @@ public class Button {
 	private boolean clicked = false;
 	private final int NOT_CLICKED = 0;
 	private final int CLICKED = 1;
+	private String text;
 	
-	public Button(int x, int y, int width, int height, ButtonAction action) {
+	private BitmapFont font = new BitmapFont();
+	
+	public Button(int x, int y, int width, int height, String text, ButtonAction action) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 		this.action = action;
+		this.text = text;
 	}
 
 	public void render(SpriteBatch sb) {
@@ -30,6 +35,7 @@ public class Button {
 		} else {
 			sb.draw(texture[CLICKED], x, y);
 		}
+		font.draw(sb, text, x + width/2 - font.getBounds(text).width/2, y + height/2);
 		sb.end();
 	}
 	
@@ -85,4 +91,7 @@ public class Button {
 		this.clicked = clicked;
 	}
 	
+	public void dispose() {
+		font.dispose();
+	}
 }

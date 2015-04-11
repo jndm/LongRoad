@@ -8,6 +8,7 @@ import com.mygdx.game.states.Battle;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.Play;
 import com.mygdx.game.elements.Enemy;
+import com.mygdx.game.elements.Character;
 
 public class GameStateManager {
 	
@@ -45,8 +46,8 @@ public class GameStateManager {
 		pushState(state);
 	}
 	
-	public void pushBattleState(int state, Array<Enemy> enemies) {
-		gameStates.push(new Battle(this, enemies));
+	public void pushBattleState(int state, Array<Enemy> enemies, Array<Character> chars) {
+		gameStates.push(new Battle(this, enemies, chars)); 
 	}
 	
 	public void pushState(int state) {

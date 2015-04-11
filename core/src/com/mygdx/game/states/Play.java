@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
+import com.mygdx.game.elements.Character;
 import com.mygdx.game.elements.Enemy;
 import com.mygdx.game.elements.Mage;
 import com.mygdx.game.elements.Rogue;
@@ -120,7 +121,11 @@ public class Play extends GameState {
 		rogue.move(dt);
 		
 		if(enemywaves.first().get(0).getX() - warrior.getX() < 200) {
-			gsm.pushBattleState(GameStateManager.BATTLE, enemywaves.first());
+			Array<Character> chars = new Array<Character>();
+			chars.add(mage);
+			chars.add(warrior);
+			chars.add(rogue);
+			gsm.pushBattleState(GameStateManager.BATTLE, enemywaves.first(), chars);
 			enemywaves.removeIndex(0);
 			ENEMYWAWES--;
 		}
