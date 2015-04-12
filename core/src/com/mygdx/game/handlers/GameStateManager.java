@@ -59,4 +59,8 @@ public class GameStateManager {
 		g.dispose();
 	}
 	
+	public GameState peekState() {
+		return gameStates.peek();
+	}
+	
 }

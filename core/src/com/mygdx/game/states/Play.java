@@ -129,7 +129,6 @@ public class Play extends GameState {
 			enemywaves.removeIndex(0);
 			ENEMYWAWES--;
 		}
-		
 		/* For testing how long it takes player to reach end of the level
 		if(warrior.getX() > Game.WORLD_WIDTH) {
 			System.out.println("Time elapsed: " + (System.currentTimeMillis() - startTime)/1000+"s" );

@@ -1,15 +1,15 @@
 package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
+import com.mygdx.game.elements.Character;
 import com.mygdx.game.elements.Enemy;
 import com.mygdx.game.elements.Mage;
 import com.mygdx.game.elements.Rogue;
@@ -17,7 +17,6 @@ import com.mygdx.game.elements.Warrior;
 import com.mygdx.game.handlers.GameStateManager;
 import com.mygdx.game.helpers.Button;
 import com.mygdx.game.helpers.ButtonAction;
-import com.mygdx.game.elements.Character;
 
 public class Battle extends GameState {
 	
@@ -38,6 +37,7 @@ public class Battle extends GameState {
 	private Warrior warrior;
 	private Mage mage;
 	private Rogue rogue;
+	private Vector2 oldMagePosition, oldWarriorPosition, oldRoguePosition;
 	private Array<Enemy> enemies;
 	
 	private final String BACKGROUND_IMG = "background/battle/battlebg.png";
@@ -72,14 +72,14 @@ public class Battle extends GameState {
 		initButtons();
 		
 		mage = (Mage) chars.get(0);
-		mage.setX(20);
-		mage.setY(300);
+		oldMagePosition = new Vector2(mage.getX(), mage.getY());
+		mage.setXY(20,300);
 		warrior = (Warrior) chars.get(1);
-		warrior.setX(100);
-		warrior.setY(250);
+		oldWarriorPosition = new Vector2(warrior.getX(), warrior.getY());
+		warrior.setXY(100,250);
 		rogue = (Rogue) chars.get(2);
-		rogue.setX(20);
-		rogue.setY(228);
+		oldRoguePosition = new Vector2(rogue.getX(), rogue.getY());
+		rogue.setXY(20, 228);
 	}
 
 	@Override
@@ -137,6 +137,7 @@ public class Battle extends GameState {
 						if(b.getAction() == ButtonAction.RUN) {
 							/* TODO */
 							System.out.println("RUNNING AWAY!");
+							resetCharacterPosition();
 							gsm.popState();
 						}
 					}
@@ -203,6 +204,14 @@ public class Battle extends GameState {
 	}
 	
 	private void initButtons() {
+		//Creating fonts for buttons
+		Texture fonttexture = new Texture(Gdx.files.internal("fonts/mainButton.png"));
+		fonttexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		BitmapFont mainfont = new BitmapFont(Gdx.files.internal("fonts/mainButton.fnt"), new TextureRegion(fonttexture), false);
+		
+		fonttexture = new Texture(Gdx.files.internal("fonts/subButton.png"));
+		fonttexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		BitmapFont subfont = new BitmapFont(Gdx.files.internal("fonts/subButton.fnt"), new TextureRegion(fonttexture), false);
 		
 		mainButtons = new Array<Button>();
 		attackButtons = new Array<Button>();
@@ -218,7 +227,8 @@ public class Battle extends GameState {
 						buttonsRegion[i][j].getRegionWidth(), 
 						buttonsRegion[i][j].getRegionHeight(),
 						ButtonAction.values()[k].toString(),
-						ButtonAction.values()[k]));
+						ButtonAction.values()[k],
+						mainfont));
 				TextureRegion[] tmp = new TextureRegion[2];
 				tmp[0] = buttonsRegion[i][j];
 				tmp[1] = clickedButtonRegion[i][j];
@@ -236,7 +246,8 @@ public class Battle extends GameState {
 					attackButtonRegion[i][0].getRegionWidth(), 
 					attackButtonRegion[i][0].getRegionHeight(), 
 					ButtonAction.values()[k].toString(),
-					ButtonAction.values()[k]));
+					ButtonAction.values()[k],
+					subfont));
 			TextureRegion[] tmp = new TextureRegion[2];
 			tmp[0] = attackButtonRegion[i][0];
 			tmp[1] = clickedAttackButtonRegion[i][0];
@@ -250,5 +261,11 @@ public class Battle extends GameState {
 				k=5;
 			}
 		}
+	}
+	
+	private void resetCharacterPosition() {
+		mage.setXY(oldMagePosition.x, oldMagePosition.y);
+		warrior.setXY(oldWarriorPosition.x, oldWarriorPosition.y);
+		rogue.setXY(oldRoguePosition.x, oldRoguePosition.y);	
 	}
 }

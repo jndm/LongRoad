@@ -17,15 +17,16 @@ public class Button {
 	private final int CLICKED = 1;
 	private String text;
 	
-	private BitmapFont font = new BitmapFont();
+	private BitmapFont font;
 	
-	public Button(int x, int y, int width, int height, String text, ButtonAction action) {
+	public Button(int x, int y, int width, int height, String text, ButtonAction action, BitmapFont font) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 		this.action = action;
 		this.text = text;
+		this.font = font;
 	}
 
 	public void render(SpriteBatch sb) {
@@ -35,7 +36,7 @@ public class Button {
 		} else {
 			sb.draw(texture[CLICKED], x, y);
 		}
-		font.draw(sb, text, x + width/2 - font.getBounds(text).width/2, y + height/2);
+		font.draw(sb, text, x + width/2 - font.getBounds(text).width/2, y + height/2 + font.getBounds(text).height/2);
 		sb.end();
 	}
 	
