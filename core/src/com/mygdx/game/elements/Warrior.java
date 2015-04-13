@@ -5,7 +5,7 @@ public class Warrior extends Character {
 
 	public Warrior(int x, int y) {
 		super(x, y);
-		// TODO Auto-generated constructor stub
+		this.setAttackSpeed(30);
 	}
 
 	@Override

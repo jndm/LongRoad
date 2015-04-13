@@ -46,8 +46,8 @@ public class GameStateManager {
 		pushState(state);
 	}
 	
-	public void pushBattleState(int state, Array<Enemy> enemies, Array<Character> chars) {
-		gameStates.push(new Battle(this, enemies, chars)); 
+	public void pushBattleState(int state, Array<Character> array, Array<Character> chars) {
+		gameStates.push(new Battle(this, array, chars)); 
 	}
 	
 	public void pushState(int state) {

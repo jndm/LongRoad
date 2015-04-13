@@ -1,9 +1,10 @@
 package com.mygdx.game.elements;
 
-public class Skeleton extends Enemy {
+public class Skeleton extends Character {
 	
 	public Skeleton(int x, int y) {
 		super(x, y);
+		this.setAttackSpeed(5);
 	}
 	
 	@Override

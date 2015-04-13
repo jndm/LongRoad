@@ -7,7 +7,15 @@ public enum ButtonAction {
 	ITEM, 
 	RUN, 
 	
-	//Attack actions:
+	//WARRIOR Attack actions:
 	DEFAULTATTACK,
-	SPECIALATTACK
+	SPECIALATTACK,
+	
+	//MAGE Attack actions:
+	DEFAULTMAGEATTACK,
+	SPECIALMAGEATTACK,
+	
+	//ROGUE Attack actions:
+	DEFAULTROGUEATTACK,
+	SPECIALROGUEATTACK
 }

@@ -25,7 +25,6 @@ public abstract class GameState {
 		assets = game.getAssetManger();
 	}
 	
-	public abstract void handleInput();
 	public abstract void update(float dt);
 	public abstract void render();
 	public abstract void dispose();

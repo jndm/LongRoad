@@ -5,6 +5,7 @@ public class Mage extends Character {
 
 	public Mage (int x, int y) {
 		super(x, y);
+		this.setAttackSpeed(10);
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ public class Rogue extends Character {
 
 	public Rogue(int x, int y) {
 		super(x, y);
+		this.setAttackSpeed(20);
 	}
 
 	@Override

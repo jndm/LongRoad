@@ -28,8 +28,8 @@ public class Play extends GameState {
 	private Warrior warrior;
 	private Mage mage;
 	private Rogue rogue;
-	private Array<Enemy> enemies;
-	private Array<Array<Enemy>> enemywaves;
+	private Array<Character> enemies;
+	private Array<Array<Character>> enemywaves;
 	
 	private long startTime;
 	private int ENEMYWAWES = 50;
@@ -62,12 +62,12 @@ public class Play extends GameState {
 		mage = new Mage(20, 150);
 		rogue = new Rogue(20, 20);
 			
-		enemywaves = new Array<Array<Enemy>>();
+		enemywaves = new Array<Array<Character>>();
 		
 		//Raffling enemywave sizes NEEDS REFACTORING
 		for(int i=0; i < ENEMYWAWES; i++) {
 			Skeleton s;
-			enemies = new Array<Enemy>();
+			enemies = new Array<Character>();
 			if(i < 17) { 
 				s = new Skeleton(700 + i * 700, 80);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));

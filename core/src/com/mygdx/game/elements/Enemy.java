@@ -32,6 +32,7 @@ public abstract class Enemy {
 	public abstract void attack();
 	public abstract void cast();
 	public abstract void addEquipment(Equipment equipment);
+	public abstract void addCharge();
 	
 	public void setTexture(Texture t){ texture = t; }
 	public Texture getTexture() { return texture; }
