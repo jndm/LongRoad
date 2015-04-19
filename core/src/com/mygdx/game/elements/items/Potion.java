@@ -12,7 +12,11 @@ public class Potion implements Item {
 	
 	@Override
 	public void use(Character user) {
-		user.setHp(user.getHp() + effect);
+		if(user.getHp() + effect < user.getMaxHp()) {
+			user.setHp(user.getHp() + effect);
+		} else {
+			user.setHp(user.getMaxHp());
+		}
 		System.out.println("Potion used for "+user.getClass().getName());
 		count -= 1;
 	}

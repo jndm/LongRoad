@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.elements.characters.Abilities.Ability;
 import com.mygdx.game.elements.items.Equipment;
 
 
@@ -22,6 +23,8 @@ public abstract class Character {
 	protected float attackChargeMax = 100;
 	protected float attackCharge = 0;
 	protected float defaultAttackDmg;
+	protected Array<Ability> attackAbilities;
+	protected Array<Ability> spells;
 	
 	public Character(int x, int y) {
 		this.x = x;
@@ -103,6 +106,14 @@ public abstract class Character {
 	public void setMaxHp(float maxHp) { this.maxHp = maxHp; }
 
 	public float getMaxMana() { return maxMana; }
-	public void setMaxMana(float maxMana) { this.maxMana = maxMana; }	
+	public void setMaxMana(float maxMana) { this.maxMana = maxMana; }
+
+	public Array<Ability> getAttackAbilities() { return attackAbilities; }
+	public void setAttackAbilities(Array<Ability> attackAbilities) { this.attackAbilities = attackAbilities; }
+
+	public Array<Ability> getSpells() { return spells; }
+	public void setSpells(Array<Ability> spells) { this.spells = spells; }	
+	
+	
 	
 }

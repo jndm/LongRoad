@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Game;
+import com.mygdx.game.elements.characters.Abilities.Ability;
 import com.mygdx.game.elements.characters.Abilities.MageAbilities;
 import com.mygdx.game.elements.characters.Abilities.RogueAbilities;
 import com.mygdx.game.elements.characters.Abilities.WarriorAbilities;
@@ -15,9 +16,7 @@ public class Button {
 	private int width;
 	private int height;
 	private ButtonAction action;
-	private WarriorAbilities actionW;
-	private MageAbilities actionM;
-	private RogueAbilities actionR;
+	private Ability action2;
 	private Item item;
 	private TextureRegion[] texture = new TextureRegion[3];
 	private boolean clicked = false;
@@ -40,35 +39,13 @@ public class Button {
 		this.font = font;
 	}
 	
-	//Constructor for warrior's buttons
-	public Button(int x, int y, int width, int height, String text, WarriorAbilities action, BitmapFont font) {
+	//Constructor for sub buttons
+	public Button(int x, int y, int width, int height, String text, Ability action, BitmapFont font) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		this.actionW = action;
-		this.text = text;
-		this.font = font;
-	}
-	
-	//Constructor for mage's buttons
-	public Button(int x, int y, int width, int height, String text, MageAbilities action, BitmapFont font) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.actionM = action;
-		this.text = text;
-		this.font = font;
-	}
-	
-	//Constructor for rogue's buttons
-	public Button(int x, int y, int width, int height, String text, RogueAbilities action, BitmapFont font) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.actionR = action;
+		this.action2 = action;
 		this.text = text;
 		this.font = font;
 	}
@@ -116,16 +93,8 @@ public class Button {
 		return action;
 	}
 	
-	public WarriorAbilities getActionW() {
-		return actionW;
-	}
-	
-	public RogueAbilities getActionR() {
-		return actionR;
-	}
-	
-	public MageAbilities getActionM() {
-		return actionM;
+	public Ability getAction2() {
+		return action2;
 	}
 
 	public int getX() {
@@ -223,21 +192,12 @@ public class Button {
 		this.action = action;
 	}
 
-	public void setActionW(WarriorAbilities actionW) {
-		this.actionW = actionW;
-	}
-
-	public void setActionM(MageAbilities actionM) {
-		this.actionM = actionM;
-	}
-
-	public void setActionR(RogueAbilities actionR) {
-		this.actionR = actionR;
+	public void setAction2(Ability action2) {
+		this.action2 = action2;
 	}
 
 	public void setItem(Item item) {
 		this.item = item;
 	}
-	
 	
 }

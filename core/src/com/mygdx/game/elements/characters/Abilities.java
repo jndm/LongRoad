@@ -1,10 +1,14 @@
 package com.mygdx.game.elements.characters;
 
 public class Abilities {
+	
+	public interface Ability {
+		
+	}
 	/*																	*/
 	/* MAX SKILL PER ATTACK STYLE IS 8 ATM, NO MORE FITS IN THE SCREEN 	*/
 	/*																	*/
-	public enum WarriorAbilities {
+	public enum WarriorAbilities implements Ability {
 		//Attack
 		DEFAULTWATTACK,
 		SPECIALWSKILL,
@@ -20,7 +24,8 @@ public class Abilities {
 		SPECIALWCAST,
 	}
 	
-	public enum MageAbilities {
+	public enum MageAbilities implements Ability {
+		//Attack
 		DEFAULTMATTACK,
 		SPECIALMSKILL,
 		
@@ -29,7 +34,8 @@ public class Abilities {
 		SPECIALMCAST,	
 	}
 
-	public enum RogueAbilities {
+	public enum RogueAbilities implements Ability {
+		//Attack
 		DEFAULTRATTACK,
 		SPECIALRSKILL,
 		

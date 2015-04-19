@@ -1,21 +1,20 @@
 package com.mygdx.game.elements.characters;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.elements.characters.Abilities.Ability;
 import com.mygdx.game.elements.characters.Abilities.MageAbilities;
 import com.mygdx.game.elements.items.Equipment;
 
 
 public class Mage extends Character {
-	private Array<MageAbilities> attackAbilities;
-	private Array<MageAbilities> spells;
 	
 	public Mage (int x, int y, float maxHp, float maxMana, float attackSpeed) {
 		super(x, y, maxHp, maxMana, attackSpeed);
-		attackAbilities = new Array<MageAbilities>();
+		attackAbilities = new Array<Ability>();
 		attackAbilities.add(MageAbilities.DEFAULTMATTACK);
 		attackAbilities.add(MageAbilities.SPECIALMSKILL);
 		
-		spells = new Array<MageAbilities>();
+		spells = new Array<Ability>();
 		spells.add(MageAbilities.DEFAULTMCAST);
 		spells.add(MageAbilities.SPECIALMCAST);
 	}
@@ -42,7 +41,7 @@ public class Mage extends Character {
 		attackAbilities.add(ability);
 	}
 
-	public Array<Abilities.MageAbilities> getAttackAbilities() {
+	public Array<Ability> getAttackAbilities() {
 		return attackAbilities;
 	}
 	
@@ -50,7 +49,7 @@ public class Mage extends Character {
 		spells.add(ability);
 	}
 
-	public Array<Abilities.MageAbilities> getSpells() {
+	public Array<Ability> getSpells() {
 		return spells;
 	}
 	

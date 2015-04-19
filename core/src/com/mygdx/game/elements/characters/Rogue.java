@@ -1,22 +1,20 @@
 package com.mygdx.game.elements.characters;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.elements.characters.Abilities.Ability;
 import com.mygdx.game.elements.characters.Abilities.RogueAbilities;
 import com.mygdx.game.elements.items.Equipment;
 
 
 public class Rogue extends Character {
-
-	private Array<RogueAbilities> attackAbilities;
-	private Array<RogueAbilities> spells;
 	
 	public Rogue(int x, int y, float maxHp, float maxMana, float attackSpeed) {
 		super(x, y, maxHp, maxMana, attackSpeed);
-		attackAbilities = new Array<RogueAbilities>();
+		attackAbilities = new Array<Ability>();
 		attackAbilities.add(RogueAbilities.DEFAULTRATTACK);
 		attackAbilities.add(RogueAbilities.SPECIALRSKILL);
 		
-		spells = new Array<RogueAbilities>();
+		spells = new Array<Ability>();
 		spells.add(RogueAbilities.DEFAULTRCAST);
 		spells.add(RogueAbilities.SPECIALRCAST);
 	}
@@ -43,7 +41,7 @@ public class Rogue extends Character {
 		attackAbilities.add(ability);
 	}
 
-	public Array<Abilities.RogueAbilities> getAttackAbilities() {
+	public Array<Ability> getAttackAbilities() {
 		return attackAbilities;
 	}
 	
@@ -51,7 +49,7 @@ public class Rogue extends Character {
 		spells.add(ability);
 	}
 
-	public Array<Abilities.RogueAbilities> getSpells() {
+	public Array<Ability> getSpells() {
 		return spells;
 	}
 	

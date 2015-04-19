@@ -1,18 +1,16 @@
 package com.mygdx.game.elements.characters;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.elements.characters.Abilities.Ability;
 import com.mygdx.game.elements.characters.Abilities.WarriorAbilities;
 import com.mygdx.game.elements.items.Equipment;
 
 
 public class Warrior extends Character {
-
-	private Array<WarriorAbilities> attackAbilities;
-	private Array<WarriorAbilities> spells;
 	
 	public Warrior(int x, int y, float maxHp, float maxMana, float attackSpeed) {
 		super(x, y, maxHp, maxMana, attackSpeed);
-		attackAbilities = new Array<WarriorAbilities>();
+		attackAbilities = new Array<Ability>();
 		attackAbilities.add(WarriorAbilities.DEFAULTWATTACK);
 		attackAbilities.add(WarriorAbilities.SPECIALWSKILL);
 		attackAbilities.add(WarriorAbilities.SPECIALWSKILL2);
@@ -23,7 +21,7 @@ public class Warrior extends Character {
 		attackAbilities.add(WarriorAbilities.SPECIALWSKILL7);
 		
 		
-		spells = new Array<WarriorAbilities>();
+		spells = new Array<Ability>();
 		spells.add(WarriorAbilities.DEFAULTWCAST);
 		spells.add(WarriorAbilities.SPECIALWCAST);
 		spells.add(WarriorAbilities.SPECIALWCAST);
@@ -56,7 +54,7 @@ public class Warrior extends Character {
 		attackAbilities.add(ability);
 	}
 
-	public Array<Abilities.WarriorAbilities> getAttackAbilities() {
+	public Array<Ability> getAttackAbilities() {
 		return attackAbilities;
 	}
 	
@@ -64,7 +62,7 @@ public class Warrior extends Character {
 		spells.add(ability);
 	}
 
-	public Array<Abilities.WarriorAbilities> getSpells() {
+	public Array<Ability> getSpells() {
 		return spells;
 	}
 

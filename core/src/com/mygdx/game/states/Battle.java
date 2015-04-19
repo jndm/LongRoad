@@ -10,6 +10,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
+import com.mygdx.game.elements.characters.Abilities.MageAbilities;
+import com.mygdx.game.elements.characters.Abilities.RogueAbilities;
+import com.mygdx.game.elements.characters.Abilities.WarriorAbilities;
 import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.characters.Mage;
 import com.mygdx.game.elements.characters.Rogue;
@@ -45,9 +48,12 @@ public class Battle extends GameState {
 	
 	private Array<Button> itemButtons;
 	
-	private Warrior warrior;
-	private Mage mage;
-	private Rogue rogue;
+	private Array<Character> playerCharacters;
+	private enum Hero {
+		MAGE,
+		WARRIOR, 
+		ROGUE
+	}
 	private Vector2 oldMagePosition, oldWarriorPosition, oldRoguePosition;
 	private Array<Character> enemies;
 	private Array<Character> turnQueue;
@@ -110,15 +116,15 @@ public class Battle extends GameState {
 		healthBarbgs = new Array<Sprite>();
 		healthBarfills = new Array<Sprite>();
 
-		mage = (Mage) chars.get(0);
-		oldMagePosition = new Vector2(mage.getX(), mage.getY());
-		mage.setXY(20, 300);
-		warrior = (Warrior) chars.get(1);
-		oldWarriorPosition = new Vector2(warrior.getX(), warrior.getY());
-		warrior.setXY(100, 250);
-		rogue = (Rogue) chars.get(2);
-		oldRoguePosition = new Vector2(rogue.getX(), rogue.getY());
-		rogue.setXY(20, 228);
+		playerCharacters = chars;
+		
+		oldMagePosition = new Vector2(playerCharacters.get(Hero.MAGE.ordinal()).getX(), playerCharacters.get(Hero.MAGE.ordinal()).getY());
+		oldWarriorPosition = new Vector2(playerCharacters.get(Hero.WARRIOR.ordinal()).getX(), playerCharacters.get(Hero.WARRIOR.ordinal()).getY());
+		oldRoguePosition = new Vector2(playerCharacters.get(Hero.ROGUE.ordinal()).getX(), playerCharacters.get(Hero.ROGUE.ordinal()).getY());
+		
+		playerCharacters.get(Hero.MAGE.ordinal()).setXY(20, 300);
+		playerCharacters.get(Hero.WARRIOR.ordinal()).setXY(100, 250);
+		playerCharacters.get(Hero.ROGUE.ordinal()).setXY(20, 228);
 		
 		for(Character c : enemies) {
 			c.setX(700);
@@ -127,23 +133,16 @@ public class Battle extends GameState {
 		
 		initButtons();
 		
-		healthBarbgs.add(new Sprite((Texture) assets.get(HEALTHBARBG_IMG)));
-		healthBarbgs.add(new Sprite((Texture) assets.get(HEALTHBARBG_IMG)));
-		healthBarbgs.add(new Sprite((Texture) assets.get(HEALTHBARBG_IMG)));
-		healthBarbgs.get(0).setPosition(mage.getX(), 	mage.getY() - healthBarbgs.get(0).getRegionHeight() - 5);
-		healthBarbgs.get(1).setPosition(warrior.getX(), warrior.getY()- healthBarbgs.get(1).getRegionHeight() - 5);
-		healthBarbgs.get(2).setPosition(rogue.getX(), 	rogue.getY()- healthBarbgs.get(2).getRegionHeight() - 5);
-
-		healthBarfills.add(new Sprite((Texture) assets.get(HEALTHBARFILL_IMG)));
-		healthBarfills.add(new Sprite((Texture) assets.get(HEALTHBARFILL_IMG)));
-		healthBarfills.add(new Sprite((Texture) assets.get(HEALTHBARFILL_IMG)));
-		healthBarfills.get(0).setPosition(mage.getX() + 1, 	mage.getY() - healthBarfills.get(0).getRegionHeight() - 6);
-		healthBarfills.get(1).setPosition(warrior.getX() + 1, warrior.getY()- healthBarfills.get(1).getRegionHeight() - 6);
-		healthBarfills.get(2).setPosition(rogue.getX() + 1, 	rogue.getY()- healthBarfills.get(2).getRegionHeight() - 6);
+		for(int i=0; i<playerCharacters.size; i++) {
+			healthBarbgs.add(new Sprite((Texture) assets.get(HEALTHBARBG_IMG)));
+			healthBarbgs.get(i).setPosition(playerCharacters.get(i).getX(), playerCharacters.get(i).getY() - healthBarbgs.get(0).getRegionHeight() - 5);
+			healthBarfills.add(new Sprite((Texture) assets.get(HEALTHBARFILL_IMG)));
+			healthBarfills.get(i).setPosition(playerCharacters.get(i).getX() + 1, 	playerCharacters.get(i).getY() - healthBarfills.get(0).getRegionHeight() - 6);
+		}
 		
 	}
 
-	public void handleWarriorInput() {
+	private void handleWarriorInput() {
 		Button clickedMainButton = null;
 		//Check if one of the main buttons is already clicked
 		for(Button b : mainButtons) {
@@ -178,12 +177,12 @@ public class Battle extends GameState {
 					case ATTACK:
 						for(Button b2 : warriorAttackButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								switch ( b2.getActionW() ) {
+								switch ( (WarriorAbilities)b2.getAction2() ) {
 								case DEFAULTWATTACK:
 									System.out.println("ATTACKING!");
 									break;
 								case SPECIALWSKILL:
-									System.out.println("ATTACKING!");
+									System.out.println("SPECIALATTACKING!");
 									break;
 								default:
 									break;
@@ -198,7 +197,7 @@ public class Battle extends GameState {
 					case ITEM:
 						for(Button b2 : itemButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								b2.getItem().use(warrior);
+								b2.getItem().use(playerCharacters.get(Hero.WARRIOR.ordinal()));
 								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
 								if(b2.getItem().getCount() == 0) {	
 									if(itemButtons.size > 1){
@@ -209,6 +208,8 @@ public class Battle extends GameState {
 									}
 									itemButtons.removeValue(b2, true);
 								}
+								turnQueue.removeIndex(0);
+								b2.setClicked(false);
 							}
 						}
 						break;
@@ -269,7 +270,7 @@ public class Battle extends GameState {
 					case ATTACK:
 						for(Button b2 : rogueAttackButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								switch ( b2.getActionR() ) {
+								switch ( (RogueAbilities)b2.getAction2() ) {
 								case DEFAULTRATTACK:
 									System.out.println("ATTACKING!");
 									turnQueue.removeIndex(0);
@@ -285,7 +286,24 @@ public class Battle extends GameState {
 						break;
 					case CAST:		
 						break;
-					case ITEM:	
+					case ITEM:
+						for(Button b2 : itemButtons){
+							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
+								b2.getItem().use(playerCharacters.get(Hero.ROGUE.ordinal()));
+								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
+								if(b2.getItem().getCount() == 0) {	
+									if(itemButtons.size > 1){
+										for(int i=0; i<itemButtons.size-1; i++){
+											itemButtons.get(i+1).setX(itemButtons.get(i).getX());
+											itemButtons.get(i+1).setY(itemButtons.get(i).getY());
+										}
+									}
+									itemButtons.removeValue(b2, true);
+								}
+								turnQueue.removeIndex(0);
+								b2.setClicked(false);
+							}
+						}
 						break;
 					case RUN:
 						break;
@@ -345,7 +363,7 @@ public class Battle extends GameState {
 					case ATTACK:
 						for(Button b2 : mageAttackButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								switch ( b2.getActionM() ) {
+								switch ( (MageAbilities)b2.getAction2() ) {
 								case DEFAULTMATTACK:
 									System.out.println("ATTACKING!");
 									turnQueue.removeIndex(0);
@@ -362,7 +380,7 @@ public class Battle extends GameState {
 					case CAST:
 						for(Button b2 : mageCastButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								switch ( b2.getActionM() ) {
+								switch ( (MageAbilities)b2.getAction2() ) {
 								case DEFAULTMATTACK:
 									System.out.println("ATTACKING!");
 									turnQueue.removeIndex(0);
@@ -376,7 +394,24 @@ public class Battle extends GameState {
 							}
 						}
 						break;
-					case ITEM:	
+					case ITEM:
+						for(Button b2 : itemButtons){
+							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
+								b2.getItem().use(playerCharacters.get(Hero.MAGE.ordinal()));
+								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
+								if(b2.getItem().getCount() == 0) {	
+									if(itemButtons.size > 1){
+										for(int i=0; i<itemButtons.size-1; i++){
+											itemButtons.get(i+1).setX(itemButtons.get(i).getX());
+											itemButtons.get(i+1).setY(itemButtons.get(i).getY());
+										}
+									}
+									itemButtons.removeValue(b2, true);
+								}
+								turnQueue.removeIndex(0);
+								b2.setClicked(false);
+							}
+						}
 						break;
 					case RUN:
 						break;
@@ -425,20 +460,12 @@ public class Battle extends GameState {
 	private void countTurn(float dt) {
 		timeElapsed += dt;
 		if(WAIT_TIME <= timeElapsed) {
-			warrior.addCharge();
-			if(warrior.isCharged()) {
-				turnQueue.add(warrior);
-				System.out.println("Warrior charged");
-			}
-			mage.addCharge();
-			if(mage.isCharged()) {
-				turnQueue.add(mage);
-				System.out.println("Mage charged");
-			}
-			rogue.addCharge();
-			if(rogue.isCharged()) {
-				turnQueue.add(rogue);
-				System.out.println("Rogue charged");
+			for(Character c : playerCharacters) {
+				c.addCharge();
+				if(c.isCharged()) {
+					turnQueue.add(c);
+					System.out.print(c.getClass().getSimpleName()+" charged!");
+				}
 			}
 			for(Character c : enemies) {
 				c.addCharge();
@@ -461,9 +488,9 @@ public class Battle extends GameState {
 		sb.end();
 		
 		//Characters
-		mage.render(sb);
-		warrior.render(sb);
-		rogue.render(sb);
+		for(Character c : playerCharacters) {
+			c.render(sb);
+		}
 		
 		for(Button b : mainButtons) {
 			b.render(sb);
@@ -507,16 +534,11 @@ public class Battle extends GameState {
 						break;
 				}
 			}
-			sb.begin();
-			
-			healthBarfills.get(0).setSize(62 * mage.getHp()/mage.getMaxHp(), healthBarfills.get(0).getHeight());
-			healthBarfills.get(1).setSize(62 * warrior.getHp()/warrior.getMaxHp(), healthBarfills.get(1).getHeight());
-			healthBarfills.get(2).setSize(62 * rogue.getHp()/rogue.getMaxHp(), healthBarfills.get(2).getHeight());
-			for(Sprite hpbg : healthBarbgs){
-				hpbg.draw(sb);
-			}	
-			for(Sprite hpfills : healthBarfills) {
-				hpfills.draw(sb);
+			sb.begin();	
+			for(int i=0; i<playerCharacters.size; i++) {
+				healthBarfills.get(i).setSize(62 * playerCharacters.get(i).getHp()/playerCharacters.get(i).getMaxHp(), healthBarfills.get(0).getHeight());
+				healthBarbgs.get(i).draw(sb);
+				healthBarfills.get(i).draw(sb);
 			}
 			sb.end();
 		}
@@ -604,114 +626,119 @@ public class Battle extends GameState {
 		subBbot[1] = new TextureRegion((Texture)assets.get(SUBBUTTONBOTTOMHOVER_IMG), 0, 0, 150, 50);
 		subBbot[2] = new TextureRegion((Texture)assets.get(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG), 0, 0, 150, 50);
 		
-		//Warrior's buttons:
-		for(int i=0; i<warrior.getAttackAbilities().size; i++) {
-			warriorAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
-					(warrior.getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/warrior.getAttackAbilities().size, 
-					subBtop[0].getRegionWidth(), 
-					subBtop[0].getRegionHeight(), 
-					warrior.getAttackAbilities().get(i).toString(),
-					warrior.getAttackAbilities().get(i),
-					subfont));
-			
-			if(i == 0) {
-				warriorAttackButtons.get(i).setTextureRegion(subBtop);
-			} else if(i < warrior.getAttackAbilities().size-1){
-				warriorAttackButtons.get(i).setTextureRegion(subBmid);
-			} else {
-				warriorAttackButtons.get(i).setTextureRegion(subBbot);
+		for(int j=0; j<playerCharacters.size; j++) {
+			for(int i=0; i<playerCharacters.get(j).getAttackAbilities().size; i++) {
+				//Warrior attack buttons
+				if(playerCharacters.get(j) instanceof Warrior) { 
+					warriorAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
+							(playerCharacters.get(j).getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/playerCharacters.get(j).getAttackAbilities().size, 
+							subBtop[0].getRegionWidth(), 
+							subBtop[0].getRegionHeight(), 
+							playerCharacters.get(j).getAttackAbilities().get(i).toString(),
+							playerCharacters.get(j).getAttackAbilities().get(i),
+							subfont));
+					
+					if(i == 0) {
+						warriorAttackButtons.get(i).setTextureRegion(subBtop);
+					} else if(i < playerCharacters.get(j).getAttackAbilities().size-1){
+						warriorAttackButtons.get(i).setTextureRegion(subBmid);
+					} else {
+						warriorAttackButtons.get(i).setTextureRegion(subBbot);
+					}
+				} 
+				//Mage attack buttons:
+				else if(playerCharacters.get(j) instanceof Mage) {
+					mageAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
+							(playerCharacters.get(j).getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/playerCharacters.get(j).getAttackAbilities().size, 
+							subBtop[0].getRegionWidth(), 
+							subBtop[0].getRegionHeight(), 
+							playerCharacters.get(j).getAttackAbilities().get(i).toString(),
+							playerCharacters.get(j).getAttackAbilities().get(i),
+							subfont));
+					
+					if(i == 0) {
+						mageAttackButtons.get(i).setTextureRegion(subBtop);
+					} else if(i < playerCharacters.get(j).getAttackAbilities().size-1){
+						mageAttackButtons.get(i).setTextureRegion(subBmid);
+					} else {
+						mageAttackButtons.get(i).setTextureRegion(subBbot);
+					}
+				} 
+				//Rogue attack buttons:
+				else if(playerCharacters.get(j) instanceof Rogue) {
+					rogueAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
+							(playerCharacters.get(j).getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/playerCharacters.get(j).getAttackAbilities().size, 
+							subBtop[0].getRegionWidth(), 
+							subBtop[0].getRegionHeight(), 
+							playerCharacters.get(j).getAttackAbilities().get(i).toString(),
+							playerCharacters.get(j).getAttackAbilities().get(i),
+							subfont));
+					
+					if(i == 0) {
+						rogueAttackButtons.get(i).setTextureRegion(subBtop);
+					} else if(i < playerCharacters.get(j).getAttackAbilities().size-1){
+						rogueAttackButtons.get(i).setTextureRegion(subBmid);
+					} else {
+						rogueAttackButtons.get(i).setTextureRegion(subBbot);
+					}
+				}
 			}
-		}				
-		
-		for(int i=0; i<warrior.getSpells().size; i++) {
-			warriorCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
-					(warrior.getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/warrior.getSpells().size, 
-					subBtop[0].getRegionWidth(), 
-					subBtop[0].getRegionHeight(), 
-					warrior.getSpells().get(i).toString(),
-					warrior.getSpells().get(i),
-					subfont));
 			
-			if(i == 0) {
-				warriorCastButtons.get(i).setTextureRegion(subBtop);
-			} else if(i < warrior.getSpells().size-1){
-				warriorCastButtons.get(i).setTextureRegion(subBmid);
-			} else {
-				warriorCastButtons.get(i).setTextureRegion(subBbot);
-			}
-		}
-		
-		//Mage buttons:
-		for(int i=0; i<mage.getAttackAbilities().size; i++) {
-			mageAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
-					(mage.getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/mage.getAttackAbilities().size, 
-					subBtop[0].getRegionWidth(), 
-					subBtop[0].getRegionHeight(), 
-					mage.getAttackAbilities().get(i).toString(),
-					mage.getAttackAbilities().get(i),
-					subfont));
-			
-			if(i == 0) {
-				mageAttackButtons.get(i).setTextureRegion(subBtop);
-			} else if(i < mage.getAttackAbilities().size-1){
-				mageAttackButtons.get(i).setTextureRegion(subBmid);
-			} else {
-				mageAttackButtons.get(i).setTextureRegion(subBbot);
-			}
-		}
-		
-		for(int i=0; i<mage.getSpells().size; i++) {
-			mageCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
-					(mage.getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/mage.getSpells().size, 
-					subBtop[0].getRegionWidth(), 
-					subBtop[0].getRegionHeight(), 
-					mage.getSpells().get(i).toString(),
-					mage.getSpells().get(i),
-					subfont));
-			
-			if(i == 0) {
-				mageCastButtons.get(i).setTextureRegion(subBtop);
-			} else if(i < mage.getSpells().size-1){
-				mageCastButtons.get(i).setTextureRegion(subBmid);
-			} else {
-				mageCastButtons.get(i).setTextureRegion(subBbot);
-			}
-		}
-		
-		//Rogue buttons:
-		for(int i=0; i<rogue.getAttackAbilities().size; i++) {
-			rogueAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
-					(rogue.getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/rogue.getAttackAbilities().size, 
-					subBtop[0].getRegionWidth(), 
-					subBtop[0].getRegionHeight(), 
-					rogue.getAttackAbilities().get(i).toString(),
-					rogue.getAttackAbilities().get(i),
-					subfont));
-			
-			if(i == 0) {
-				rogueAttackButtons.get(i).setTextureRegion(subBtop);
-			} else if(i < rogue.getAttackAbilities().size-1){
-				rogueAttackButtons.get(i).setTextureRegion(subBmid);
-			} else {
-				rogueAttackButtons.get(i).setTextureRegion(subBbot);
-			}
-		}
-		
-		for(int i=0; i<rogue.getSpells().size; i++) {
-			rogueCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
-					(rogue.getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/rogue.getSpells().size, 
-					subBtop[0].getRegionWidth(), 
-					subBtop[0].getRegionHeight(), 
-					rogue.getSpells().get(i).toString(),
-					rogue.getSpells().get(i),
-					subfont));
-			
-			if(i == 0) {
-				rogueCastButtons.get(i).setTextureRegion(subBtop);
-			} else if(i < rogue.getSpells().size-1){
-				rogueCastButtons.get(i).setTextureRegion(subBmid);
-			} else {
-				rogueCastButtons.get(i).setTextureRegion(subBbot);
+			for(int i=0; i<playerCharacters.get(j).getSpells().size; i++) {
+				//Warrior cast buttons:
+				if(playerCharacters.get(j) instanceof Warrior) { 
+					warriorCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
+							(playerCharacters.get(j).getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/playerCharacters.get(j).getSpells().size, 
+							subBtop[0].getRegionWidth(), 
+							subBtop[0].getRegionHeight(), 
+							playerCharacters.get(j).getSpells().get(i).toString(),
+							playerCharacters.get(j).getSpells().get(i),
+							subfont));
+					
+					if(i == 0) {
+						warriorCastButtons.get(i).setTextureRegion(subBtop);
+					} else if(i < playerCharacters.get(j).getSpells().size-1){
+						warriorCastButtons.get(i).setTextureRegion(subBmid);
+					} else {
+						warriorCastButtons.get(i).setTextureRegion(subBbot);
+					}
+				} 
+				//Mage cast buttons:
+				else if(playerCharacters.get(j) instanceof Mage) { 
+					mageCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
+							(playerCharacters.get(j).getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/playerCharacters.get(j).getSpells().size, 
+							subBtop[0].getRegionWidth(), 
+							subBtop[0].getRegionHeight(), 
+							playerCharacters.get(j).getSpells().get(i).toString(),
+							playerCharacters.get(j).getSpells().get(i),
+							subfont));
+					
+					if(i == 0) {
+						mageCastButtons.get(i).setTextureRegion(subBtop);
+					} else if(i < playerCharacters.get(j).getSpells().size-1){
+						mageCastButtons.get(i).setTextureRegion(subBmid);
+					} else {
+						mageCastButtons.get(i).setTextureRegion(subBbot);
+					}
+				} 
+				//Rogue cast buttons:
+				else if(playerCharacters.get(j) instanceof Rogue) { 
+					rogueCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
+							(playerCharacters.get(j).getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/playerCharacters.get(j).getSpells().size, 
+							subBtop[0].getRegionWidth(), 
+							subBtop[0].getRegionHeight(), 
+							playerCharacters.get(j).getSpells().get(i).toString(),
+							playerCharacters.get(j).getSpells().get(i),
+							subfont));
+					
+					if(i == 0) {
+						rogueCastButtons.get(i).setTextureRegion(subBtop);
+					} else if(i < playerCharacters.get(j).getSpells().size-1){
+						rogueCastButtons.get(i).setTextureRegion(subBmid);
+					} else {
+						rogueCastButtons.get(i).setTextureRegion(subBbot);
+					}
+				}
 			}
 		}
 		
@@ -742,11 +769,11 @@ public class Battle extends GameState {
 	}
 	
 	private void resetCharacters() {
-		mage.setXY(oldMagePosition.x, oldMagePosition.y);
-		warrior.setXY(oldWarriorPosition.x, oldWarriorPosition.y);
-		rogue.setXY(oldRoguePosition.x, oldRoguePosition.y);
-		mage.setAttackCharge(0);
-		warrior.setAttackCharge(0);
-		rogue.setAttackCharge(0);
+		playerCharacters.get(Hero.MAGE.ordinal()).setXY(oldMagePosition.x, oldMagePosition.y);
+		playerCharacters.get(Hero.WARRIOR.ordinal()).setXY(oldWarriorPosition.x, oldWarriorPosition.y);
+		playerCharacters.get(Hero.ROGUE.ordinal()).setXY(oldRoguePosition.x, oldRoguePosition.y);
+		playerCharacters.get(Hero.MAGE.ordinal()).setAttackCharge(0);
+		playerCharacters.get(Hero.WARRIOR.ordinal()).setAttackCharge(0);
+		playerCharacters.get(Hero.ROGUE.ordinal()).setAttackCharge(0);
 	}
 }
