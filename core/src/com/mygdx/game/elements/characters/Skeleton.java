@@ -1,11 +1,12 @@
-package com.mygdx.game.elements;
+package com.mygdx.game.elements.characters;
 
+import com.mygdx.game.elements.items.Equipment;
 
-public class Mage extends Character {
-
-	public Mage (int x, int y) {
+public class Skeleton extends Character {
+	
+	public Skeleton(int x, int y) {
 		super(x, y);
-		this.setAttackSpeed(10);
+		this.setAttackSpeed(5);
 	}
 	
 	@Override
@@ -25,4 +26,5 @@ public class Mage extends Character {
 		// TODO Auto-generated method stub
 		
 	}
+	
 }

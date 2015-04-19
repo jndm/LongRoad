@@ -1,21 +1,19 @@
 package com.mygdx.game.states;
 
-import java.util.Iterator;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
-import com.mygdx.game.elements.Character;
-import com.mygdx.game.elements.Enemy;
-import com.mygdx.game.elements.Mage;
-import com.mygdx.game.elements.Rogue;
-import com.mygdx.game.elements.Skeleton;
-import com.mygdx.game.elements.Warrior;
+import com.mygdx.game.elements.characters.Character;
+import com.mygdx.game.elements.characters.Mage;
+import com.mygdx.game.elements.characters.Rogue;
+import com.mygdx.game.elements.characters.Skeleton;
+import com.mygdx.game.elements.characters.Warrior;
+import com.mygdx.game.elements.items.Item;
+import com.mygdx.game.elements.items.Potion;
 import com.mygdx.game.handlers.GameStateManager;
 
 public class Play extends GameState {
@@ -28,14 +26,13 @@ public class Play extends GameState {
 	private Warrior warrior;
 	private Mage mage;
 	private Rogue rogue;
-	private Array<Character> enemies;
 	private Array<Array<Character>> enemywaves;
+	private Array<Item> items;
 	
-	private long startTime;
+	private long startTime = 0;
+	
 	private int ENEMYWAWES = 50;
-	private final int ENEMYSPAWNRANGE = Game.WORLD_WIDTH / ENEMYWAWES;
 	private final float ENEMYHPMULTIPLIER = 0.15f;
-	private int enemiesDrawn = 0;
 	
 	private final String BACKGROUND_IMG = "background/background.png";
 	private final String WINDOW_IMG = "background/window.png";
@@ -58,16 +55,43 @@ public class Play extends GameState {
 		bg = assets.get(BACKGROUND_IMG);
 		window = assets.get(WINDOW_IMG);
 		
-		warrior = new Warrior(100, 80);
-		mage = new Mage(20, 150);
-		rogue = new Rogue(20, 20);
-			
+		createPlayerCharacters();
+		createEnemies();
+		createItems();
+		
+		startTime = System.currentTimeMillis();
+		
+	}
+	
+	private void createItems() {
+		items = new Array<Item>();
+		Item potion = new Potion();
+		potion.addCount(3);
+		items.add(potion);
+		
+		Item potion2 = new Potion();
+		potion2.addCount(3);
+		items.add(potion2);
+	}
+
+	private void createPlayerCharacters() {
+		warrior = new Warrior(100, 80, 120, 50, 30);
+		mage = new Mage(20, 150, 80, 120, 10);
+		rogue = new Rogue(20, 20, 100, 70, 20);
+		
+		warrior.setTexture((Texture)assets.get(WARRIOR_IMG));
+		mage.setTexture((Texture)assets.get(MAGE_IMG));
+		rogue.setTexture((Texture)assets.get(ROGUE_IMG));
+		
+	}
+
+	private void createEnemies() {
 		enemywaves = new Array<Array<Character>>();
 		
-		//Raffling enemywave sizes NEEDS REFACTORING
+		//Raffling enemywave sizes NEEDS REFACTORING and more enemies
 		for(int i=0; i < ENEMYWAWES; i++) {
 			Skeleton s;
-			enemies = new Array<Character>();
+			Array<Character> enemies = new Array<Character>();
 			if(i < 17) { 
 				s = new Skeleton(700 + i * 700, 80);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));
@@ -100,23 +124,13 @@ public class Play extends GameState {
 			}
 			
 			enemywaves.add(enemies);
-		}
-		
-		enemies.clear();
-		
-		warrior.setTexture((Texture)assets.get(WARRIOR_IMG));
-		mage.setTexture((Texture)assets.get(MAGE_IMG));
-		rogue.setTexture((Texture)assets.get(ROGUE_IMG));
-		
-		startTime = System.currentTimeMillis();
-		
+		}	
 	}
-	
+
 	public void handleInput() {}
 	
 	public void update(float dt) {
 		warrior.move(dt);
-		System.out.println(warrior.getX());
 		mage.move(dt);
 		rogue.move(dt);
 		
@@ -125,7 +139,7 @@ public class Play extends GameState {
 			chars.add(mage);
 			chars.add(warrior);
 			chars.add(rogue);
-			gsm.pushBattleState(GameStateManager.BATTLE, enemywaves.first(), chars);
+			gsm.pushBattleState(GameStateManager.BATTLE, enemywaves.first(), chars, items);
 			enemywaves.removeIndex(0);
 			ENEMYWAWES--;
 		}

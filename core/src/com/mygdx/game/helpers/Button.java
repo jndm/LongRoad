@@ -4,6 +4,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Game;
+import com.mygdx.game.elements.characters.Abilities.MageAbilities;
+import com.mygdx.game.elements.characters.Abilities.RogueAbilities;
+import com.mygdx.game.elements.characters.Abilities.WarriorAbilities;
+import com.mygdx.game.elements.items.Item;
 
 public class Button {
 	private int x;
@@ -11,14 +15,21 @@ public class Button {
 	private int width;
 	private int height;
 	private ButtonAction action;
-	private TextureRegion[] texture = new TextureRegion[2];
+	private WarriorAbilities actionW;
+	private MageAbilities actionM;
+	private RogueAbilities actionR;
+	private Item item;
+	private TextureRegion[] texture = new TextureRegion[3];
 	private boolean clicked = false;
+	private boolean clickable = true;
 	private final int NOT_CLICKED = 0;
 	private final int CLICKED = 1;
+	private final int NOT_CLICKABLE = 2;
 	private String text;
 	
 	private BitmapFont font;
 	
+	//Constructor for main buttons
 	public Button(int x, int y, int width, int height, String text, ButtonAction action, BitmapFont font) {
 		this.x = x;
 		this.y = y;
@@ -28,13 +39,61 @@ public class Button {
 		this.text = text;
 		this.font = font;
 	}
+	
+	//Constructor for warrior's buttons
+	public Button(int x, int y, int width, int height, String text, WarriorAbilities action, BitmapFont font) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.actionW = action;
+		this.text = text;
+		this.font = font;
+	}
+	
+	//Constructor for mage's buttons
+	public Button(int x, int y, int width, int height, String text, MageAbilities action, BitmapFont font) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.actionM = action;
+		this.text = text;
+		this.font = font;
+	}
+	
+	//Constructor for rogue's buttons
+	public Button(int x, int y, int width, int height, String text, RogueAbilities action, BitmapFont font) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.actionR = action;
+		this.text = text;
+		this.font = font;
+	}
+	
+	//Constructor for item buttons
+	public Button(int x, int y, int width, int height, String text, Item item, BitmapFont font) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.item = item;
+		this.text = text;
+		this.font = font;
+	}
 
 	public void render(SpriteBatch sb) {
 		sb.begin();
-		if(!clicked){
-			sb.draw(texture[NOT_CLICKED], x, y);
+		if(!clickable) {
+			sb.draw(texture[NOT_CLICKABLE], x, y);
 		} else {
-			sb.draw(texture[CLICKED], x, y);
+			if(!clicked){
+				sb.draw(texture[NOT_CLICKED], x, y);
+			} else {
+				sb.draw(texture[CLICKED], x, y);
+			}
 		}
 		font.draw(sb, text, x + width/2 - font.getBounds(text).width/2, y + height/2 + font.getBounds(text).height/2);
 		sb.end();
@@ -55,6 +114,18 @@ public class Button {
 	
 	public ButtonAction getAction() {
 		return action;
+	}
+	
+	public WarriorAbilities getActionW() {
+		return actionW;
+	}
+	
+	public RogueAbilities getActionR() {
+		return actionR;
+	}
+	
+	public MageAbilities getActionM() {
+		return actionM;
 	}
 
 	public int getX() {
@@ -95,4 +166,78 @@ public class Button {
 	public void dispose() {
 		font.dispose();
 	}
+
+	public void setClickable(boolean b) {
+		clickable = b;
+	}
+
+	public Item getItem() {
+		return item;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public TextureRegion[] getTexture() {
+		return texture;
+	}
+
+	public void setTexture(TextureRegion[] texture) {
+		this.texture = texture;
+	}
+
+	public BitmapFont getFont() {
+		return font;
+	}
+
+	public void setFont(BitmapFont font) {
+		this.font = font;
+	}
+
+	public boolean isClickable() {
+		return clickable;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public void setAction(ButtonAction action) {
+		this.action = action;
+	}
+
+	public void setActionW(WarriorAbilities actionW) {
+		this.actionW = actionW;
+	}
+
+	public void setActionM(MageAbilities actionM) {
+		this.actionM = actionM;
+	}
+
+	public void setActionR(RogueAbilities actionR) {
+		this.actionR = actionR;
+	}
+
+	public void setItem(Item item) {
+		this.item = item;
+	}
+	
+	
 }

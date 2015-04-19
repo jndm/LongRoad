@@ -1,28 +1,41 @@
-package com.mygdx.game.elements;
+package com.mygdx.game.elements.characters;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.elements.items.Equipment;
 
 
 public abstract class Character {
 	
-	private Texture texture;
-	private TextureRegion[] textureReg;
-	private Array<Equipment> equipment;
-	private float x, y;
-	private float movementSpeed = 100;
-	private float hp;
-	private int mana;
-	private int attackSpeed;
-	private float attackChargeMax = 100;
-	private float attackCharge = 0;
-	private float defaultAttackDmg;
+	protected Texture texture;
+	protected TextureRegion[] textureReg;
+	protected Array<Equipment> equipment;
+	protected float x, y;
+	protected float movementSpeed = 100;
+	protected float maxHp;
+	protected float hp;
+	protected float maxMana;
+	protected float mana;
+	protected float attackSpeed;
+	protected float attackChargeMax = 100;
+	protected float attackCharge = 0;
+	protected float defaultAttackDmg;
 	
 	public Character(int x, int y) {
 		this.x = x;
 		this.y = y;
+	}
+	
+	public Character(int x, int y, float maxHp, float maxMana, float attackspeed) {
+		this.x = x;
+		this.y = y;
+		this.maxHp = maxHp;
+		this.hp = maxHp;
+		this.maxMana = maxMana;
+		this.mana = maxMana;
+		this.attackSpeed = attackspeed;
 	}
 	
 	public void render(SpriteBatch sb){
@@ -71,7 +84,7 @@ public abstract class Character {
 	public float getHp() { return hp; }
 	public void setHp(float hp) { this.hp = hp; }
 	
-	public int getAttackSpeed() { return attackSpeed; }
+	public float getAttackSpeed() { return attackSpeed; }
 	public void setAttackSpeed(int attackSpeed) { this.attackSpeed = attackSpeed; }
 	
 	public void setDefaultAttackDmg(float defAttDmg) { this.defaultAttackDmg = defAttDmg; }
@@ -81,6 +94,15 @@ public abstract class Character {
 	public void setAttackChargeMax(float attackCharge) { this.attackChargeMax = attackCharge; }
 	
 	public float getAttackCharge() { return attackCharge; }
-	public void setAttackCharge(float attackCharge) { this.attackCharge = attackCharge; }	
+	public void setAttackCharge(float attackCharge) { this.attackCharge = attackCharge; }
 
+	public float getMana() { return mana; }
+	public void setMana(int mana) { this.mana = mana; }
+
+	public float getMaxHp() { return maxHp; }
+	public void setMaxHp(float maxHp) { this.maxHp = maxHp; }
+
+	public float getMaxMana() { return maxMana; }
+	public void setMaxMana(float maxMana) { this.maxMana = maxMana; }	
+	
 }

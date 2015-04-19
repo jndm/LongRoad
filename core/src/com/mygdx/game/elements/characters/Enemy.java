@@ -1,8 +1,9 @@
-package com.mygdx.game.elements;
+package com.mygdx.game.elements.characters;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.mygdx.game.elements.items.Equipment;
 
 public abstract class Enemy {
 	private float hp;
