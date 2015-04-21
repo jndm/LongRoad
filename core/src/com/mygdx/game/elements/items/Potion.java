@@ -17,7 +17,7 @@ public class Potion implements Item {
 		} else {
 			user.setHp(user.getMaxHp());
 		}
-		System.out.println("Potion used for "+user.getClass().getName());
+		System.out.println("Potion used for "+user.getClass().getSimpleName());
 		count -= 1;
 	}
 	

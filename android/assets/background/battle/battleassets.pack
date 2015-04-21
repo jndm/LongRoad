@@ -1,0 +1,117 @@
+
+battle1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+itembg
+  rotate: false
+  xy: 2, 2
+  size: 150, 400
+  orig: 150, 400
+  offset: 0, 0
+  index: -1
+background
+  rotate: false
+  xy: 154, 2
+  size: 800, 272
+  orig: 800, 272
+  offset: 0, 0
+  index: -1
+notClickableButtons
+  rotate: false
+  xy: 154, 276
+  size: 800, 208
+  orig: 800, 208
+  offset: 0, 0
+  index: -1
+clickedButtons
+  rotate: false
+  xy: 154, 486
+  size: 800, 208
+  orig: 800, 208
+  offset: 0, 0
+  index: -1
+buttons
+  rotate: false
+  xy: 154, 696
+  size: 800, 208
+  orig: 800, 208
+  offset: 0, 0
+  index: -1
+subButtonTopNotclickable
+  rotate: false
+  xy: 2, 404
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subButtonTopHover
+  rotate: false
+  xy: 2, 456
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subButtonTop
+  rotate: false
+  xy: 2, 508
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subButtonMiddleNotclickable
+  rotate: false
+  xy: 2, 560
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subButtonMiddleHover
+  rotate: false
+  xy: 2, 612
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subButtonMiddle
+  rotate: false
+  xy: 2, 664
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subButtonBottomNotclickable
+  rotate: false
+  xy: 2, 716
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subButtonBottomHover
+  rotate: false
+  xy: 2, 768
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subButtonBottom
+  rotate: false
+  xy: 2, 820
+  size: 150, 50
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+healthbarbg
+  rotate: false
+  xy: 2, 872
+  size: 64, 10
+  orig: 64, 10
+  offset: 0, 0
+  index: -1
+healthbarfill
+  rotate: false
+  xy: 68, 872
+  size: 62, 8
+  orig: 62, 8
+  offset: 0, 0
+  index: -1

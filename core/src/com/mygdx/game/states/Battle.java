@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -27,12 +28,13 @@ public class Battle extends GameState {
 	private final int BUTTON_ROWS = 2;
 	private final int BUTTON_COLS = 2;
 	
-	private Texture bg;
+	private TextureRegion bg;
 	private Sprite itembg;
 	
 	private Array<Sprite> healthBarbgs;
 	private Array<Sprite> healthBarfills;
 
+	private TextureAtlas atlas;
 	private TextureRegion[][] buttonsRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
 	private TextureRegion[][] notClickablebuttonsRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
 	private TextureRegion[][] clickedButtonRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
@@ -61,26 +63,28 @@ public class Battle extends GameState {
 	private final float WAIT_TIME = 1f;
 	private float timeElapsed = 0;
 	
-	private final String BACKGROUND_IMG 					= "background/battle/battlebg.png";
+	private final String BACKGROUND_IMG 					= "background";
 	
-	private final String SUBBUTTONTOP_IMG 					= "background/battle/subButtonTop.png";
-	private final String SUBBUTTONMID_IMG 					= "background/battle/subButtonMiddle.png";
-	private final String SUBBUTTONBOTTOM_IMG 				= "background/battle/subButtonBottom.png";
-	private final String SUBBUTTONTOPHOVER_IMG 				= "background/battle/subButtonTopHover.png";
-	private final String SUBBUTTONMIDHOVER_IMG 				= "background/battle/subButtonMiddleHover.png";
-	private final String SUBBUTTONBOTTOMHOVER_IMG		 	= "background/battle/subButtonBottomHover.png";
-	private final String SUBBUTTONTOP_NOTCLICKABLE_IMG 		= "background/battle/subButtonTopNotClickable.png";
-	private final String SUBBUTTONMID_NOTCLICKABLE_IMG 		= "background/battle/subButtonMiddleNotClickable.png";
-	private final String SUBBUTTONBOTTOM_NOTCLICKABLE_IMG 	= "background/battle/subButtonBottomNotClickable.png";
+	private final String SUBBUTTONTOP_IMG 					= "subButtonTop";
+	private final String SUBBUTTONMID_IMG 					= "subButtonMiddle";
+	private final String SUBBUTTONBOTTOM_IMG 				= "subButtonBottom";
+	private final String SUBBUTTONTOPHOVER_IMG 				= "subButtonTopHover";
+	private final String SUBBUTTONMIDHOVER_IMG 				= "subButtonMiddleHover";
+	private final String SUBBUTTONBOTTOMHOVER_IMG		 	= "subButtonBottomHover";
+	private final String SUBBUTTONTOP_NOTCLICKABLE_IMG 		= "subButtonTopNotClickable";
+	private final String SUBBUTTONMID_NOTCLICKABLE_IMG 		= "subButtonMiddleNotClickable";
+	private final String SUBBUTTONBOTTOM_NOTCLICKABLE_IMG 	= "subButtonBottomNotClickable";
 
-	private final String BUTTONS_IMG 						= "background/battle/buttons.png";
-	private final String CLICKED_BUTTONS_IMG 				= "background/battle/clickedButtons.png";
-	private final String NOT_CLICKABLE_BUTTONS_IMG 			= "background/battle/notClickableButtons.png";
+	private final String BUTTONS_IMG 						= "buttons";
+	private final String CLICKED_BUTTONS_IMG 				= "clickedButtons";
+	private final String NOT_CLICKABLE_BUTTONS_IMG 			= "notClickableButtons";
 	
-	private final String ITEMBG_IMG 						= "background/battle/itembg.png";
+	private final String ITEMBG_IMG 						= "itembg";
 	
-	private final String HEALTHBARBG_IMG 					= "background/battle/healthbarbg.png";
-	private final String HEALTHBARFILL_IMG 					= "background/battle/healthbarfill.png";
+	private final String HEALTHBARBG_IMG 					= "healthbarbg";
+	private final String HEALTHBARFILL_IMG 					= "healthbarfill";
+	
+	private final String BATTLEATLAS						= "background/battle/battleassets.pack";
 		
 	private BitmapFont font = new BitmapFont();
 	
@@ -94,25 +98,11 @@ public class Battle extends GameState {
 		this.items = items;
 		turnQueue = new Array<Character>();
 		
-		assets.load(BACKGROUND_IMG, Texture.class);
-		assets.load(BUTTONS_IMG, Texture.class);
-		assets.load(CLICKED_BUTTONS_IMG, Texture.class);
-		assets.load(NOT_CLICKABLE_BUTTONS_IMG, Texture.class);
-		assets.load(SUBBUTTONTOP_IMG, Texture.class);					
-		assets.load(SUBBUTTONMID_IMG, Texture.class); 					
-		assets.load(SUBBUTTONBOTTOM_IMG, Texture.class); 				
-		assets.load(SUBBUTTONTOPHOVER_IMG, Texture.class); 				
-		assets.load(SUBBUTTONMIDHOVER_IMG, Texture.class); 				
-		assets.load(SUBBUTTONBOTTOMHOVER_IMG, Texture.class);		 
-		assets.load(SUBBUTTONTOP_NOTCLICKABLE_IMG, Texture.class); 		
-		assets.load(SUBBUTTONMID_NOTCLICKABLE_IMG, Texture.class); 		
-		assets.load(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG, Texture.class);
-		assets.load(ITEMBG_IMG, Texture.class);
-		assets.load(HEALTHBARBG_IMG, Texture.class);
-		assets.load(HEALTHBARFILL_IMG, Texture.class);
+		assets.load(BATTLEATLAS, TextureAtlas.class);
 		assets.finishLoading();
 		
-		bg = assets.get(BACKGROUND_IMG);
+		atlas = assets.get(BATTLEATLAS);
+		bg = atlas.findRegion(BACKGROUND_IMG);
 		healthBarbgs = new Array<Sprite>();
 		healthBarfills = new Array<Sprite>();
 
@@ -134,9 +124,9 @@ public class Battle extends GameState {
 		initButtons();
 		
 		for(int i=0; i<playerCharacters.size; i++) {
-			healthBarbgs.add(new Sprite((Texture) assets.get(HEALTHBARBG_IMG)));
+			healthBarbgs.add(new Sprite(atlas.findRegion(HEALTHBARBG_IMG)));
 			healthBarbgs.get(i).setPosition(playerCharacters.get(i).getX(), playerCharacters.get(i).getY() - healthBarbgs.get(0).getRegionHeight() - 5);
-			healthBarfills.add(new Sprite((Texture) assets.get(HEALTHBARFILL_IMG)));
+			healthBarfills.add(new Sprite(atlas.findRegion(HEALTHBARFILL_IMG)));
 			healthBarfills.get(i).setPosition(playerCharacters.get(i).getX() + 1, 	playerCharacters.get(i).getY() - healthBarfills.get(0).getRegionHeight() - 6);
 		}
 		
@@ -484,7 +474,7 @@ public class Battle extends GameState {
 		sb.setProjectionMatrix(hudCam.combined);
 
 		sb.begin();
-			sb.draw(bg, 0, Game.HEIGHT - bg.getHeight());
+			sb.draw(bg, 0, Game.HEIGHT - bg.getRegionHeight());
 		sb.end();
 		
 		//Characters
@@ -554,19 +544,7 @@ public class Battle extends GameState {
 	
 	@Override
 	public void dispose() {
-		assets.unload(BACKGROUND_IMG);
-		assets.unload(BUTTONS_IMG);
-		assets.unload(CLICKED_BUTTONS_IMG);
-		assets.unload(NOT_CLICKABLE_BUTTONS_IMG);
-		assets.unload(SUBBUTTONTOP_IMG);					
-		assets.unload(SUBBUTTONMID_IMG); 					
-		assets.unload(SUBBUTTONBOTTOM_IMG); 				
-		assets.unload(SUBBUTTONTOPHOVER_IMG); 				
-		assets.unload(SUBBUTTONMIDHOVER_IMG); 				
-		assets.unload(SUBBUTTONBOTTOMHOVER_IMG);		 
-		assets.unload(SUBBUTTONTOP_NOTCLICKABLE_IMG); 		
-		assets.unload(SUBBUTTONMID_NOTCLICKABLE_IMG); 		
-		assets.unload(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG);
+		assets.unload(BATTLEATLAS);
 		font.dispose();
 		resetCharacters();
 	}
@@ -588,9 +566,9 @@ public class Battle extends GameState {
 		warriorCastButtons = new Array<Button>();
 		mageCastButtons = new Array<Button>();
 		rogueCastButtons = new Array<Button>();
-		buttonsRegion = TextureRegion.split((Texture)assets.get(BUTTONS_IMG), 400, 104);
-		clickedButtonRegion = TextureRegion.split((Texture)assets.get(CLICKED_BUTTONS_IMG), 400, 104);
-		notClickablebuttonsRegion = TextureRegion.split((Texture)assets.get(NOT_CLICKABLE_BUTTONS_IMG), 400, 104);
+		buttonsRegion = atlas.findRegion(BUTTONS_IMG).split(400,104);
+		clickedButtonRegion = atlas.findRegion(CLICKED_BUTTONS_IMG).split(400, 104);
+		notClickablebuttonsRegion = atlas.findRegion(NOT_CLICKABLE_BUTTONS_IMG).split(400, 104);
 		
 		//Creating button objects, k is for keeping number of buttons combined updated for setting action values
 		int k=0;
@@ -616,15 +594,15 @@ public class Battle extends GameState {
 		TextureRegion[] subBmid = new TextureRegion[3];
 		TextureRegion[] subBbot = new TextureRegion[3];
 		
-		subBtop[0] = new TextureRegion((Texture)assets.get(SUBBUTTONTOP_IMG), 0, 0, 150, 50);
-		subBtop[1] = new TextureRegion((Texture)assets.get(SUBBUTTONTOPHOVER_IMG), 0, 0, 150, 50);
-		subBtop[2] = new TextureRegion((Texture)assets.get(SUBBUTTONTOP_NOTCLICKABLE_IMG), 0, 0, 150, 50);
-		subBmid[0] = new TextureRegion((Texture)assets.get(SUBBUTTONMID_IMG), 0, 0, 150, 50);
-		subBmid[1] = new TextureRegion((Texture)assets.get(SUBBUTTONMIDHOVER_IMG), 0, 0, 150, 50);
-		subBmid[2] = new TextureRegion((Texture)assets.get(SUBBUTTONMID_NOTCLICKABLE_IMG), 0, 0, 150, 50);
-		subBbot[0] = new TextureRegion((Texture)assets.get(SUBBUTTONBOTTOM_IMG), 0, 0, 150, 50);
-		subBbot[1] = new TextureRegion((Texture)assets.get(SUBBUTTONBOTTOMHOVER_IMG), 0, 0, 150, 50);
-		subBbot[2] = new TextureRegion((Texture)assets.get(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG), 0, 0, 150, 50);
+		subBtop[0] = atlas.findRegion(SUBBUTTONTOP_IMG);
+		subBtop[1] = atlas.findRegion(SUBBUTTONTOPHOVER_IMG);
+		subBtop[2] = atlas.findRegion(SUBBUTTONTOP_NOTCLICKABLE_IMG);
+		subBmid[0] = atlas.findRegion(SUBBUTTONMID_IMG);
+		subBmid[1] = atlas.findRegion(SUBBUTTONMIDHOVER_IMG);
+		subBmid[2] = atlas.findRegion(SUBBUTTONMID_NOTCLICKABLE_IMG);
+		subBbot[0] = atlas.findRegion(SUBBUTTONBOTTOM_IMG);
+		subBbot[1] = atlas.findRegion(SUBBUTTONBOTTOMHOVER_IMG);
+		subBbot[2] = atlas.findRegion(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG);
 		
 		for(int j=0; j<playerCharacters.size; j++) {
 			for(int i=0; i<playerCharacters.get(j).getAttackAbilities().size; i++) {
@@ -744,7 +722,7 @@ public class Battle extends GameState {
 		
 		//Item buttons:
 		//BG:
-		itembg = new Sprite((Texture)assets.get(ITEMBG_IMG));
+		itembg = new Sprite(atlas.findRegion(ITEMBG_IMG));
 		itembg.setPosition(mainButtons.get(2).getWidth()/4, mainButtons.get(2).getHeight()/2);
 		
 		//Buttons:
