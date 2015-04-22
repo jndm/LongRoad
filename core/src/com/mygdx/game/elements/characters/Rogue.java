@@ -1,31 +1,34 @@
 package com.mygdx.game.elements.characters;
 
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.elements.characters.Abilities.Ability;
-import com.mygdx.game.elements.characters.Abilities.RogueAbilities;
 import com.mygdx.game.elements.items.Equipment;
+import com.mygdx.game.elements.skills.Skill;
+import com.mygdx.game.elements.skills.attacks.DefaultAttack;
+import com.mygdx.game.elements.skills.attacks.SpecialAttack;
+import com.mygdx.game.elements.skills.spells.DefaultSpell;
+import com.mygdx.game.elements.skills.spells.SpecialSpell;
 
 
 public class Rogue extends Character {
 	
-	public Rogue(int x, int y, float maxHp, float maxMana, float attackSpeed) {
-		super(x, y, maxHp, maxMana, attackSpeed);
-		attackAbilities = new Array<Ability>();
-		attackAbilities.add(RogueAbilities.DEFAULTRATTACK);
-		attackAbilities.add(RogueAbilities.SPECIALRSKILL);
+	public Rogue(int x, int y, float maxHp, float maxMana, float attackspeed,
+			int strength, int agility, int intelligence) {
+		super(x, y, maxHp, maxMana, attackspeed, strength, agility, intelligence);
+
+		attackAbilities = new Array<Skill>();
+		attackAbilities.add(new DefaultAttack());
+		attackAbilities.add(new SpecialAttack());
 		
-		spells = new Array<Ability>();
-		spells.add(RogueAbilities.DEFAULTRCAST);
-		spells.add(RogueAbilities.SPECIALRCAST);
+		spells = new Array<Skill>();
+		spells.add(new DefaultSpell());
+		spells.add(new SpecialSpell());
 	}
 
-	@Override
-	public void attack() {
+	public void attack(Character target) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void cast() {
 		// TODO Auto-generated method stub
 		
@@ -37,19 +40,19 @@ public class Rogue extends Character {
 		
 	}
 	
-	public void addUnlockAttackSkill(Abilities.RogueAbilities ability) {
+	public void addUnlockAttackSkill(Skill ability) {
 		attackAbilities.add(ability);
 	}
 
-	public Array<Ability> getAttackAbilities() {
+	public Array<Skill> getAttackAbilities() {
 		return attackAbilities;
 	}
 	
-	public void addUnlockCastSkill(Abilities.RogueAbilities ability) {
+	public void addUnlockCastSkill(Skill ability) {
 		spells.add(ability);
 	}
 
-	public Array<Ability> getSpells() {
+	public Array<Skill> getSpells() {
 		return spells;
 	}
 	

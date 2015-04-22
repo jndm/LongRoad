@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.characters.Character;
@@ -75,14 +76,26 @@ public class Play extends GameState {
 	}
 
 	private void createPlayerCharacters() {
-		warrior = new Warrior(100, 80, 120, 50, 30);
-		mage = new Mage(20, 150, 80, 120, 10);
-		rogue = new Rogue(20, 20, 100, 70, 20);
+		warrior = new Warrior(100, 80, 120, 50, 30, 12, 8, 4);
+		mage = new Mage(20, 150, 80, 120, 20, 4, 10, 12);
+		rogue = new Rogue(20, 20, 100, 70, 20, 8, 12, 5);
 		
 		warrior.setTexture((Texture)assets.get(WARRIOR_IMG));
 		mage.setTexture((Texture)assets.get(MAGE_IMG));
 		rogue.setTexture((Texture)assets.get(ROGUE_IMG));
 		
+		//JUST FOR TESTING
+		warrior.createAttackAnimation(new TextureRegion((Texture)assets.get(WARRIOR_IMG), 0, 0, warrior.getTexture().getWidth(), warrior.getTexture().getHeight()), 
+				new TextureRegion((Texture)assets.get(MAGE_IMG), 0, 0, mage.getTexture().getWidth(), mage.getTexture().getHeight()), 
+				new TextureRegion((Texture)assets.get(ROGUE_IMG), 0, 0, rogue.getTexture().getWidth(), rogue.getTexture().getHeight()));
+		
+		mage.createAttackAnimation(new TextureRegion((Texture)assets.get(MAGE_IMG), 0, 0, mage.getTexture().getWidth(), mage.getTexture().getHeight()), 
+				new TextureRegion((Texture)assets.get(WARRIOR_IMG), 0, 0, mage.getTexture().getWidth(), mage.getTexture().getHeight()), 
+				new TextureRegion((Texture)assets.get(ROGUE_IMG), 0, 0, rogue.getTexture().getWidth(), rogue.getTexture().getHeight()));	
+		
+		rogue.createAttackAnimation(new TextureRegion((Texture)assets.get(ROGUE_IMG), 0, 0, warrior.getTexture().getWidth(), warrior.getTexture().getHeight()), 
+				new TextureRegion((Texture)assets.get(MAGE_IMG), 0, 0, mage.getTexture().getWidth(), mage.getTexture().getHeight()), 
+				new TextureRegion((Texture)assets.get(WARRIOR_IMG), 0, 0, rogue.getTexture().getWidth(), rogue.getTexture().getHeight()));	
 	}
 
 	private void createEnemies() {

@@ -9,13 +9,11 @@ public class Skeleton extends Character {
 		this.setAttackSpeed(5);
 	}
 	
-	@Override
-	public void attack() {
+	public void attack(Character target) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void cast() {
 		// TODO Auto-generated method stub
 		

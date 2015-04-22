@@ -4,11 +4,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Game;
-import com.mygdx.game.elements.characters.Abilities.Ability;
-import com.mygdx.game.elements.characters.Abilities.MageAbilities;
-import com.mygdx.game.elements.characters.Abilities.RogueAbilities;
-import com.mygdx.game.elements.characters.Abilities.WarriorAbilities;
 import com.mygdx.game.elements.items.Item;
+import com.mygdx.game.elements.skills.Skill;
 
 public class Button {
 	private int x;
@@ -16,7 +13,7 @@ public class Button {
 	private int width;
 	private int height;
 	private ButtonAction action;
-	private Ability action2;
+	private Skill action2;
 	private Item item;
 	private TextureRegion[] texture = new TextureRegion[3];
 	private boolean clicked = false;
@@ -40,7 +37,7 @@ public class Button {
 	}
 	
 	//Constructor for sub buttons
-	public Button(int x, int y, int width, int height, String text, Ability action, BitmapFont font) {
+	public Button(int x, int y, int width, int height, String text, Skill action, BitmapFont font) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -93,7 +90,7 @@ public class Button {
 		return action;
 	}
 	
-	public Ability getAction2() {
+	public Skill getAction2() {
 		return action2;
 	}
 
@@ -192,7 +189,7 @@ public class Button {
 		this.action = action;
 	}
 
-	public void setAction2(Ability action2) {
+	public void setAction2(Skill action2) {
 		this.action2 = action2;
 	}
 

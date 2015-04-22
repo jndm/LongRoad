@@ -11,14 +11,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
-import com.mygdx.game.elements.characters.Abilities.MageAbilities;
-import com.mygdx.game.elements.characters.Abilities.RogueAbilities;
-import com.mygdx.game.elements.characters.Abilities.WarriorAbilities;
 import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.characters.Mage;
 import com.mygdx.game.elements.characters.Rogue;
 import com.mygdx.game.elements.characters.Warrior;
 import com.mygdx.game.elements.items.Item;
+import com.mygdx.game.elements.skills.Skill;
 import com.mygdx.game.handlers.GameStateManager;
 import com.mygdx.game.helpers.Button;
 import com.mygdx.game.helpers.ButtonAction;
@@ -34,12 +32,16 @@ public class Battle extends GameState {
 	private Array<Sprite> healthBarbgs;
 	private Array<Sprite> healthBarfills;
 
+	//Buttons
 	private TextureAtlas atlas;
 	private TextureRegion[][] buttonsRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
 	private TextureRegion[][] notClickablebuttonsRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
 	private TextureRegion[][] clickedButtonRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
 	
 	private Array<Button> mainButtons;
+	private Array<Button> subAttackButtons;
+	private Array<Button> subCastButtons;
+	
 	private Array<Button> warriorAttackButtons;
 	private Array<Button> mageAttackButtons;
 	private Array<Button> rogueAttackButtons;
@@ -50,19 +52,29 @@ public class Battle extends GameState {
 	
 	private Array<Button> itemButtons;
 	
+	//Character
 	private Array<Character> playerCharacters;
-	private enum Hero {
-		MAGE,
-		WARRIOR, 
-		ROGUE
-	}
+	private final int MAGE = 0;
+	private final int WARRIOR = 1;
+	private final int ROGUE = 2;
+	private Character target;
+	
 	private Vector2 oldMagePosition, oldWarriorPosition, oldRoguePosition;
 	private Array<Character> enemies;
 	private Array<Character> turnQueue;
 	private Array<Item> items;
 	private final float WAIT_TIME = 1f;
 	private float timeElapsed = 0;
+	private Skill activeAction;
+	private final int ACTIONMOVEMAX = 300;
+	private final float ORIGINALMAGEX = 20;
+	private final float ORIGINALWARRIORX = 100;
+	private final float ORIGINALROGUEX = 20;
+	private boolean steppedForvard = false;
+	private boolean animationPlayed = false;
+	private float stateTime = 0;
 	
+	//Final variables for images
 	private final String BACKGROUND_IMG 					= "background";
 	
 	private final String SUBBUTTONTOP_IMG 					= "subButtonTop";
@@ -85,7 +97,7 @@ public class Battle extends GameState {
 	private final String HEALTHBARFILL_IMG 					= "healthbarfill";
 	
 	private final String BATTLEATLAS						= "background/battle/battleassets.pack";
-		
+	
 	private BitmapFont font = new BitmapFont();
 	
 	public Battle(GameStateManager gsm) {
@@ -108,13 +120,13 @@ public class Battle extends GameState {
 
 		playerCharacters = chars;
 		
-		oldMagePosition = new Vector2(playerCharacters.get(Hero.MAGE.ordinal()).getX(), playerCharacters.get(Hero.MAGE.ordinal()).getY());
-		oldWarriorPosition = new Vector2(playerCharacters.get(Hero.WARRIOR.ordinal()).getX(), playerCharacters.get(Hero.WARRIOR.ordinal()).getY());
-		oldRoguePosition = new Vector2(playerCharacters.get(Hero.ROGUE.ordinal()).getX(), playerCharacters.get(Hero.ROGUE.ordinal()).getY());
+		oldMagePosition = new Vector2(playerCharacters.get(MAGE).getX(), playerCharacters.get(MAGE).getY());
+		oldWarriorPosition = new Vector2(playerCharacters.get(WARRIOR).getX(), playerCharacters.get(WARRIOR).getY());
+		oldRoguePosition = new Vector2(playerCharacters.get(ROGUE).getX(), playerCharacters.get(ROGUE).getY());
 		
-		playerCharacters.get(Hero.MAGE.ordinal()).setXY(20, 300);
-		playerCharacters.get(Hero.WARRIOR.ordinal()).setXY(100, 250);
-		playerCharacters.get(Hero.ROGUE.ordinal()).setXY(20, 228);
+		playerCharacters.get(MAGE).setXY(ORIGINALMAGEX, 300);
+		playerCharacters.get(WARRIOR).setXY(ORIGINALWARRIORX, 250);
+		playerCharacters.get(ROGUE).setXY(ORIGINALROGUEX, 228);
 		
 		for(Character c : enemies) {
 			c.setX(700);
@@ -132,7 +144,7 @@ public class Battle extends GameState {
 		
 	}
 
-	private void handleWarriorInput() {
+	private void handleInput() {
 		Button clickedMainButton = null;
 		//Check if one of the main buttons is already clicked
 		for(Button b : mainButtons) {
@@ -141,55 +153,38 @@ public class Battle extends GameState {
 			}
 		}
 		
-		//for hovering effect
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ATTACK) {
-			for(Button b2 : warriorAttackButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
-		
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.CAST) {
-			for(Button b2 : warriorCastButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
-		
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ITEM) {
-			for(Button b2 : itemButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
+		checkSubButtonHovering(clickedMainButton);
 		
 		if(Gdx.input.justTouched()) {
 			// check if player clicked one of the sub-buttons and act
 			if(clickedMainButton != null){
 				switch( clickedMainButton.getAction()) {
+				
 					case ATTACK:
-						for(Button b2 : warriorAttackButtons){
+						for(Button b2 : subAttackButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								switch ( (WarriorAbilities)b2.getAction2() ) {
-								case DEFAULTWATTACK:
-									System.out.println("ATTACKING!");
-									break;
-								case SPECIALWSKILL:
-									System.out.println("SPECIALATTACKING!");
-									break;
-								default:
-									break;
-								}
+								activeAction = b2.getAction2();
+								b2.setClicked(false);
+							}
+						}
+						break;
+						
+					case CAST:
+						for(Button b2 : subCastButtons){
+							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
+								
 								turnQueue.removeIndex(0);
 								b2.setClicked(false);
 							}
 						}
 						break;
-					case CAST:
-						break;
+						
 					case ITEM:
 						for(Button b2 : itemButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								b2.getItem().use(playerCharacters.get(Hero.WARRIOR.ordinal()));
+								b2.getItem().use(playerCharacters.get(WARRIOR));
 								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
-								if(b2.getItem().getCount() == 0) {	
+								if(b2.getItem().getCount() == 0) {	//If items count is 0, move next item higher in the items line
 									if(itemButtons.size > 1){
 										for(int i=0; i<itemButtons.size-1; i++){
 											itemButtons.get(i+1).setX(itemButtons.get(i).getX());
@@ -203,8 +198,10 @@ public class Battle extends GameState {
 							}
 						}
 						break;
+						
 					case RUN:
 						break;
+						
 				default:
 					break;
 				}
@@ -215,7 +212,6 @@ public class Battle extends GameState {
 				for(Button b : mainButtons) {
 					if(b.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
 						if(b.getAction() == ButtonAction.RUN) {
-							/* TODO */
 							System.out.println("RUNNING AWAY!");
 							gsm.popState();
 						}
@@ -225,24 +221,16 @@ public class Battle extends GameState {
 		}
 	}
 	
-	private void handleRogueInput() {
-		Button clickedMainButton = null;
-		//Check if one of the main buttons is already clicked
-		for(Button b : mainButtons) {
-			if(b.isClicked()) {
-				clickedMainButton = b;
-			}
-		}
-		
+	private void checkSubButtonHovering(Button clickedMainButton) {
 		//for hovering effect
 		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ATTACK) {
-			for(Button b2 : rogueAttackButtons){
+			for(Button b2 : subAttackButtons){
 				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
 			}
 		}
 		
 		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.CAST) {
-			for(Button b2 : rogueCastButtons){
+			for(Button b2 : subCastButtons){
 				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
 			}
 		}
@@ -252,199 +240,95 @@ public class Battle extends GameState {
 				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
 			}
 		}
-		
-		if(Gdx.input.justTouched()) {
-			// check if player clicked one of the sub-buttons and act
-			if(clickedMainButton != null){
-				switch( clickedMainButton.getAction()) {
-					case ATTACK:
-						for(Button b2 : rogueAttackButtons){
-							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								switch ( (RogueAbilities)b2.getAction2() ) {
-								case DEFAULTRATTACK:
-									System.out.println("ATTACKING!");
-									turnQueue.removeIndex(0);
-									b2.setClicked(false);
-									break;
-								case SPECIALRSKILL:
-									break;
-								default:
-									break;
-								}
-							}
-						}
-						break;
-					case CAST:		
-						break;
-					case ITEM:
-						for(Button b2 : itemButtons){
-							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								b2.getItem().use(playerCharacters.get(Hero.ROGUE.ordinal()));
-								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
-								if(b2.getItem().getCount() == 0) {	
-									if(itemButtons.size > 1){
-										for(int i=0; i<itemButtons.size-1; i++){
-											itemButtons.get(i+1).setX(itemButtons.get(i).getX());
-											itemButtons.get(i+1).setY(itemButtons.get(i).getY());
-										}
-									}
-									itemButtons.removeValue(b2, true);
-								}
-								turnQueue.removeIndex(0);
-								b2.setClicked(false);
-							}
-						}
-						break;
-					case RUN:
-						break;
-				default:
-					break;
-				}
-				clickedMainButton.setClicked(false);
-			}
-			//If none of the main buttons are clicked, check if player hit main button
-			else {
-				for(Button b : mainButtons) {
-					if(b.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-						if(b.getAction() == ButtonAction.RUN) {
-							/* TODO */
-							System.out.println("RUNNING AWAY!");
-							gsm.popState();
-						}
-					}
-				}
-			} 
-		}
-		
-	}
-
-	private void handleMageInput() {
-		Button clickedMainButton = null;
-		//Check if one of the main buttons is already clicked
-		for(Button b : mainButtons) {
-			if(b.isClicked()) {
-				clickedMainButton = b;
-			}
-		}
-		
-		//for hovering effect
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ATTACK) {
-			for(Button b2 : mageAttackButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
-		
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.CAST) {
-			for(Button b2 : mageCastButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
-		
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ITEM) {
-			for(Button b2 : itemButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
-		
-		if(Gdx.input.justTouched()) {
-			// check if player clicked one of the sub-buttons and act
-			if(clickedMainButton != null){
-				switch( clickedMainButton.getAction()) {
-					case ATTACK:
-						for(Button b2 : mageAttackButtons){
-							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								switch ( (MageAbilities)b2.getAction2() ) {
-								case DEFAULTMATTACK:
-									System.out.println("ATTACKING!");
-									turnQueue.removeIndex(0);
-									b2.setClicked(false);
-									break;
-								case SPECIALMSKILL:
-									break;
-								default:
-									break;
-								}
-							}
-						}
-						break;
-					case CAST:
-						for(Button b2 : mageCastButtons){
-							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								switch ( (MageAbilities)b2.getAction2() ) {
-								case DEFAULTMATTACK:
-									System.out.println("ATTACKING!");
-									turnQueue.removeIndex(0);
-									b2.setClicked(false);
-									break;
-								case SPECIALMSKILL:
-									break;
-								default:
-									break;
-								}
-							}
-						}
-						break;
-					case ITEM:
-						for(Button b2 : itemButtons){
-							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								b2.getItem().use(playerCharacters.get(Hero.MAGE.ordinal()));
-								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
-								if(b2.getItem().getCount() == 0) {	
-									if(itemButtons.size > 1){
-										for(int i=0; i<itemButtons.size-1; i++){
-											itemButtons.get(i+1).setX(itemButtons.get(i).getX());
-											itemButtons.get(i+1).setY(itemButtons.get(i).getY());
-										}
-									}
-									itemButtons.removeValue(b2, true);
-								}
-								turnQueue.removeIndex(0);
-								b2.setClicked(false);
-							}
-						}
-						break;
-					case RUN:
-						break;
-				default:
-					break;
-				}
-				clickedMainButton.setClicked(false);
-			}
-			//If none of the main buttons are clicked, check if player hit main button
-			else {
-				for(Button b : mainButtons) {
-					if(b.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-						if(b.getAction() == ButtonAction.RUN) {
-							/* TODO */
-							System.out.println("RUNNING AWAY!");
-							gsm.popState();
-						}
-					}
-				}
-			} 
-		}	
 	}
 
 	@Override
 	public void update(float dt) {
-		if(turnQueue.size == 0) {
-			resetButtonClickable();
-			countTurn(dt);
-		} else {
-			Character c = turnQueue.first();
-			for(Button b : mainButtons) {
-				b.setClickable(true);
+		//If there is no action to be shown:
+		if(activeAction == null) {
+			if(turnQueue.size == 0) {
+				resetButtonClickable();
+				countTurn(dt);
+			} else {
+				for(Button b : mainButtons) {
+					b.setClickable(true);
+				}
+				if(turnQueue.first() instanceof Warrior) {
+					subAttackButtons = warriorAttackButtons;
+					subCastButtons = warriorCastButtons;
+				}else if (turnQueue.first() instanceof Mage) {
+					subAttackButtons = mageAttackButtons;
+					subCastButtons = mageCastButtons;
+				}else if (turnQueue.first() instanceof Rogue) {
+					subAttackButtons = rogueAttackButtons;
+					subCastButtons = rogueCastButtons;
+				}else {
+					
+				}			
+				handleInput();
 			}
-			if(c instanceof Warrior) {
-				handleWarriorInput();
-			}else if (c instanceof Mage) {
-				handleMageInput();
-			}else if (c instanceof Rogue) {
-				handleRogueInput();
+			
+			checkTarget();
+		}
+		//If there is an action to be shown wait for it to finish:
+		else {
+			doActiveAction(dt);
+		}
+	}
+
+	private void doActiveAction(float dt) {
+		stateTime += dt;
+		if(!steppedForvard){
+			if(turnQueue.first().getX() < ACTIONMOVEMAX){
+				turnQueue.first().move(dt);	
 			}else {
-				
+				steppedForvard = true;
+				turnQueue.first().setActFinished(false);
 			}
 		}
+		
+		if(steppedForvard && turnQueue.first().isActFinished()) {
+			if(turnQueue.first() instanceof Warrior) {
+				if(turnQueue.first().getX() > ORIGINALWARRIORX) {
+					turnQueue.first().moveBackward(dt);
+				} else {
+					steppedForvard = false;
+					animationPlayed = false;
+					activeAction = null;
+					turnQueue.removeIndex(0);
+				}
+			}else if (turnQueue.first() instanceof Mage) {
+				if(turnQueue.first().getX() > ORIGINALMAGEX) {
+					turnQueue.first().moveBackward(dt);
+				} else {
+					steppedForvard = false;
+					animationPlayed = false;
+					activeAction = null;
+					turnQueue.removeIndex(0);
+				}
+			}else if (turnQueue.first() instanceof Rogue) {
+				if(turnQueue.first().getX() > ORIGINALROGUEX) {
+					turnQueue.first().moveBackward(dt);
+				} else {
+					steppedForvard = false;
+					animationPlayed = false;
+					activeAction = null;
+					turnQueue.removeIndex(0);
+				}
+			}
+		}
+	}
+
+	private void checkTarget() {
+		if(Gdx.input.justTouched()) {
+			for(Character e : enemies) {
+				if(Gdx.input.getX() > e.getX() && Gdx.input.getX() < e.getX() + e.getTexture().getWidth() && 
+					Game.HEIGHT - Gdx.input.getY() > e.getY() && Game.HEIGHT - Gdx.input.getY() < e.getY() + e.getTexture().getHeight()){
+						target = e;
+						System.out.println("Target set: "+ e.getClass().getSimpleName());
+				}
+			}
+		}		
 	}
 
 	private void countTurn(float dt) {
@@ -488,26 +372,14 @@ public class Battle extends GameState {
 		
 		for(Button b : mainButtons) {
 			if(b.isClicked()) {
-				Array<Button> drawableAttackSubButtons = null;
-				Array<Button> drawableCastSubButtons = null;
-				if(turnQueue.first() instanceof Warrior) {
-					drawableAttackSubButtons = warriorAttackButtons;
-					drawableCastSubButtons = warriorCastButtons;
-				} else if(turnQueue.first() instanceof Mage) {
-					drawableAttackSubButtons = mageAttackButtons;
-					drawableCastSubButtons = mageCastButtons;
-				} else if(turnQueue.first() instanceof Rogue) {
-					drawableAttackSubButtons = rogueAttackButtons;
-					drawableCastSubButtons = rogueCastButtons;
-				}
 				switch( b.getAction() ) {
 					case ATTACK:
-						for(Button b2 : drawableAttackSubButtons) {
+						for(Button b2 : subAttackButtons) {
 							b2.render(sb);
 						}
 						break;
 					case CAST:
-						for(Button b2 : drawableCastSubButtons) {
+						for(Button b2 : subCastButtons) {
 							b2.render(sb);
 						}
 						break;
@@ -560,17 +432,21 @@ public class Battle extends GameState {
 		BitmapFont subfont = new BitmapFont(Gdx.files.internal("fonts/subButton.fnt"), new TextureRegion(fonttexture), false);
 		
 		mainButtons = new Array<Button>();
+		subAttackButtons = new Array<Button>();
+		subCastButtons = new Array<Button>();
+		
 		warriorAttackButtons = new Array<Button>();
 		mageAttackButtons = new Array<Button>();
 		rogueAttackButtons = new Array<Button>();
 		warriorCastButtons = new Array<Button>();
 		mageCastButtons = new Array<Button>();
 		rogueCastButtons = new Array<Button>();
+		
 		buttonsRegion = atlas.findRegion(BUTTONS_IMG).split(400,104);
 		clickedButtonRegion = atlas.findRegion(CLICKED_BUTTONS_IMG).split(400, 104);
 		notClickablebuttonsRegion = atlas.findRegion(NOT_CLICKABLE_BUTTONS_IMG).split(400, 104);
 		
-		//Creating button objects, k is for keeping number of buttons combined updated for setting action values
+		//Creating button main buttons
 		int k=0;
 		for(int i=0; i<BUTTON_ROWS; i++) {
 			for(int j=0; j<BUTTON_COLS; j++) {
@@ -604,6 +480,7 @@ public class Battle extends GameState {
 		subBbot[1] = atlas.findRegion(SUBBUTTONBOTTOMHOVER_IMG);
 		subBbot[2] = atlas.findRegion(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG);
 		
+		//Create character's attack and cast buttons
 		for(int j=0; j<playerCharacters.size; j++) {
 			for(int i=0; i<playerCharacters.get(j).getAttackAbilities().size; i++) {
 				//Warrior attack buttons
@@ -747,11 +624,11 @@ public class Battle extends GameState {
 	}
 	
 	private void resetCharacters() {
-		playerCharacters.get(Hero.MAGE.ordinal()).setXY(oldMagePosition.x, oldMagePosition.y);
-		playerCharacters.get(Hero.WARRIOR.ordinal()).setXY(oldWarriorPosition.x, oldWarriorPosition.y);
-		playerCharacters.get(Hero.ROGUE.ordinal()).setXY(oldRoguePosition.x, oldRoguePosition.y);
-		playerCharacters.get(Hero.MAGE.ordinal()).setAttackCharge(0);
-		playerCharacters.get(Hero.WARRIOR.ordinal()).setAttackCharge(0);
-		playerCharacters.get(Hero.ROGUE.ordinal()).setAttackCharge(0);
+		playerCharacters.get(MAGE).setXY(oldMagePosition.x, oldMagePosition.y);
+		playerCharacters.get(WARRIOR).setXY(oldWarriorPosition.x, oldWarriorPosition.y);
+		playerCharacters.get(ROGUE).setXY(oldRoguePosition.x, oldRoguePosition.y);
+		playerCharacters.get(MAGE).setAttackCharge(0);
+		playerCharacters.get(WARRIOR).setAttackCharge(0);
+		playerCharacters.get(ROGUE).setAttackCharge(0);
 	}
 }

@@ -1,31 +1,32 @@
 package com.mygdx.game.elements.characters;
 
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.elements.characters.Abilities.Ability;
-import com.mygdx.game.elements.characters.Abilities.MageAbilities;
 import com.mygdx.game.elements.items.Equipment;
+import com.mygdx.game.elements.skills.Skill;
+import com.mygdx.game.elements.skills.attacks.DefaultAttack;
+import com.mygdx.game.elements.skills.attacks.SpecialAttack;
+import com.mygdx.game.elements.skills.spells.DefaultSpell;
+import com.mygdx.game.elements.skills.spells.SpecialSpell;
 
 
 public class Mage extends Character {
 	
-	public Mage (int x, int y, float maxHp, float maxMana, float attackSpeed) {
-		super(x, y, maxHp, maxMana, attackSpeed);
-		attackAbilities = new Array<Ability>();
-		attackAbilities.add(MageAbilities.DEFAULTMATTACK);
-		attackAbilities.add(MageAbilities.SPECIALMSKILL);
+	public Mage(int x, int y, float maxHp, float maxMana, float attackspeed,
+			int strength, int agility, int intelligence) {
+		super(x, y, maxHp, maxMana, attackspeed, strength, agility, intelligence);
+		attackAbilities = new Array<Skill>();
+		attackAbilities.add(new DefaultAttack());
+		attackAbilities.add(new SpecialAttack());
 		
-		spells = new Array<Ability>();
-		spells.add(MageAbilities.DEFAULTMCAST);
-		spells.add(MageAbilities.SPECIALMCAST);
+		spells = new Array<Skill>();
+		spells.add(new DefaultSpell());
+		spells.add(new SpecialSpell());
 	}
 	
-	@Override
-	public void attack() {
-		// TODO Auto-generated method stub
+	public void attack(Character target) {
 		
 	}
 
-	@Override
 	public void cast() {
 		// TODO Auto-generated method stub
 		
@@ -37,19 +38,19 @@ public class Mage extends Character {
 		
 	}
 	
-	public void addUnlockAttackSkill(Abilities.MageAbilities ability) {
+	public void addUnlockAttackSkill(Skill ability) {
 		attackAbilities.add(ability);
 	}
 
-	public Array<Ability> getAttackAbilities() {
+	public Array<Skill> getAttackAbilities() {
 		return attackAbilities;
 	}
 	
-	public void addUnlockCastSkill(Abilities.MageAbilities ability) {
+	public void addUnlockCastSkill(Skill ability) {
 		spells.add(ability);
 	}
 
-	public Array<Ability> getSpells() {
+	public Array<Skill> getSpells() {
 		return spells;
 	}
 	
