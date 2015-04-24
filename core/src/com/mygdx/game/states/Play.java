@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
+import com.mygdx.game.elements.ai.Ai;
+import com.mygdx.game.elements.ai.SkeletonAi;
 import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.characters.Mage;
 import com.mygdx.game.elements.characters.Rogue;
@@ -71,8 +73,12 @@ public class Play extends GameState {
 		items.add(potion);
 		
 		Item potion2 = new Potion();
-		potion2.addCount(3);
+		potion2.addCount(2);
 		items.add(potion2);
+		
+		Item potion3 = new Potion();
+		potion3.addCount(3);
+		items.add(potion3);
 	}
 
 	private void createPlayerCharacters() {
@@ -100,39 +106,36 @@ public class Play extends GameState {
 
 	private void createEnemies() {
 		enemywaves = new Array<Array<Character>>();
-		
+		Ai skeletonAi = new SkeletonAi();
 		//Raffling enemywave sizes NEEDS REFACTORING and more enemies
 		for(int i=0; i < ENEMYWAWES; i++) {
 			Skeleton s;
 			Array<Character> enemies = new Array<Character>();
 			if(i < 17) { 
-				s = new Skeleton(700 + i * 700, 80);
+				s = new Skeleton(700 + i * 700, 80, 80f, 120f, 10f, 4, 10, 12, skeletonAi);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));
-				s.setHp(5 + i * ENEMYHPMULTIPLIER);
+				//JUST FOR TESTING
+				s.createAttackAnimation(new TextureRegion((Texture)assets.get(WARRIOR_IMG), 0, 0, warrior.getTexture().getWidth(), warrior.getTexture().getHeight()), 
+						new TextureRegion((Texture)assets.get(MAGE_IMG), 0, 0, mage.getTexture().getWidth(), mage.getTexture().getHeight()), 
+						new TextureRegion((Texture)assets.get(ROGUE_IMG), 0, 0, rogue.getTexture().getWidth(), rogue.getTexture().getHeight()));
 				enemies.add(s);
 			} 
 			else if (i < 34) { 
-				s = new Skeleton(700 + i * 700, 150);
+				s = new Skeleton(700 + i * 700, 150, 80f, 120f, 20f, 4, 10, 12, skeletonAi);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));
-				s.setHp(5 + i * ENEMYHPMULTIPLIER);
 				enemies.add(s);
-				s = new Skeleton(700 + i * 700, 20);
+				s = new Skeleton(700 + i * 700, 20, 80f, 120f, 20f, 4, 10, 12, skeletonAi);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));
-				s.setHp(5 + i * ENEMYHPMULTIPLIER);
-				enemies.add(s);
 			} 
 			else { 
-				s = new Skeleton(700 + i * 700, 150);
+				s = new Skeleton(700 + i * 700, 150, 80f, 120f, 20f, 4, 10, 12, skeletonAi);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));
-				s.setHp(5 + i * ENEMYHPMULTIPLIER);
 				enemies.add(s);
-				s = new Skeleton(700 + i * 700 - 80, 80);
+				s = new Skeleton(700 + i * 700 - 80, 80, 80f, 120f, 20f, 4, 10, 12, skeletonAi);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));
-				s.setHp(5 + i * ENEMYHPMULTIPLIER);
 				enemies.add(s);
-				s = new Skeleton(700 + i * 700, 20);
+				s = new Skeleton(700 + i * 700, 20, 80f, 120f, 20f, 4, 10, 12, skeletonAi);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));
-				s.setHp(5 + i * ENEMYHPMULTIPLIER);
 				enemies.add(s);
 			}
 			

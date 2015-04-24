@@ -14,6 +14,7 @@ import com.mygdx.game.Game;
 import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.characters.Mage;
 import com.mygdx.game.elements.characters.Rogue;
+import com.mygdx.game.elements.characters.Skeleton;
 import com.mygdx.game.elements.characters.Warrior;
 import com.mygdx.game.elements.items.Item;
 import com.mygdx.game.elements.skills.Skill;
@@ -58,6 +59,7 @@ public class Battle extends GameState {
 	private final int WARRIOR = 1;
 	private final int ROGUE = 2;
 	private Character target;
+	private Character enemyTarget;
 	
 	private Vector2 oldMagePosition, oldWarriorPosition, oldRoguePosition;
 	private Array<Character> enemies;
@@ -71,8 +73,8 @@ public class Battle extends GameState {
 	private final float ORIGINALWARRIORX = 100;
 	private final float ORIGINALROGUEX = 20;
 	private boolean steppedForvard = false;
-	private boolean animationPlayed = false;
-	private float stateTime = 0;
+	private boolean actionFinished = false;
+	private boolean playersTurn = false;
 	
 	//Final variables for images
 	private final String BACKGROUND_IMG 					= "background";
@@ -132,7 +134,7 @@ public class Battle extends GameState {
 			c.setX(700);
 			c.setY(c.getY() + 190);
 		}
-		
+		target = enemies.first();
 		initButtons();
 		
 		for(int i=0; i<playerCharacters.size; i++) {
@@ -158,8 +160,7 @@ public class Battle extends GameState {
 		if(Gdx.input.justTouched()) {
 			// check if player clicked one of the sub-buttons and act
 			if(clickedMainButton != null){
-				switch( clickedMainButton.getAction()) {
-				
+				switch( clickedMainButton.getAction()) {			
 					case ATTACK:
 						for(Button b2 : subAttackButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
@@ -186,7 +187,7 @@ public class Battle extends GameState {
 								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
 								if(b2.getItem().getCount() == 0) {	//If items count is 0, move next item higher in the items line
 									if(itemButtons.size > 1){
-										for(int i=0; i<itemButtons.size-1; i++){
+										for(int i=itemButtons.indexOf(b2, true); i<itemButtons.size-1; i++){
 											itemButtons.get(i+1).setX(itemButtons.get(i).getX());
 											itemButtons.get(i+1).setY(itemButtons.get(i).getY());
 										}
@@ -221,27 +222,6 @@ public class Battle extends GameState {
 		}
 	}
 	
-	private void checkSubButtonHovering(Button clickedMainButton) {
-		//for hovering effect
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ATTACK) {
-			for(Button b2 : subAttackButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
-		
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.CAST) {
-			for(Button b2 : subCastButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
-		
-		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ITEM) {
-			for(Button b2 : itemButtons){
-				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
-			}
-		}
-	}
-
 	@Override
 	public void update(float dt) {
 		//If there is no action to be shown:
@@ -250,85 +230,135 @@ public class Battle extends GameState {
 				resetButtonClickable();
 				countTurn(dt);
 			} else {
-				for(Button b : mainButtons) {
-					b.setClickable(true);
-				}
 				if(turnQueue.first() instanceof Warrior) {
 					subAttackButtons = warriorAttackButtons;
 					subCastButtons = warriorCastButtons;
+					playersTurn = true;
 				}else if (turnQueue.first() instanceof Mage) {
 					subAttackButtons = mageAttackButtons;
 					subCastButtons = mageCastButtons;
+					playersTurn = true;
 				}else if (turnQueue.first() instanceof Rogue) {
 					subAttackButtons = rogueAttackButtons;
 					subCastButtons = rogueCastButtons;
-				}else {
-					
-				}			
-				handleInput();
+					playersTurn = true;
+				} else {
+					playersTurn = false;
+				}
+				if(playersTurn) {
+					for(Button b : mainButtons) {
+						b.setClickable(true);
+					}	
+					handleInput();
+				} else {
+					resetButtonClickable();
+					handleAi();
+				}
 			}
-			
-			checkTarget();
+			checkIfTargetClicked();
 		}
 		//If there is an action to be shown wait for it to finish:
 		else {
-			doActiveAction(dt);
+			if(playersTurn) {
+				doActivePlayerAction(dt);
+			} else {
+				doActiveEnemyAction(dt);
+			}
 		}
 	}
 
-	private void doActiveAction(float dt) {
-		stateTime += dt;
+	private void doActiveEnemyAction(float dt) {
+		//ACTION STEP: MOVE FORWARD -> DO ANIMATION -> MOVE BACKWARD
+		
+		//Move forward if character's x smaller than setted variable
+		if(!steppedForvard){
+			if(turnQueue.first().getX() > Game.WIDTH - ACTIONMOVEMAX){
+				turnQueue.first().moveBackward(dt);	
+			}else {
+				steppedForvard = true;
+				turnQueue.first().setActFinished(false);	//Se actFinished false so the animation will be played
+			}
+		}
+		
+		//When character has moved forvard do activeAction
+		if(steppedForvard && !actionFinished) {
+			activeAction.act(turnQueue.first(), enemyTarget);
+			actionFinished = true;
+		}
+		
+		//If character has moved enough and attack-animation has been played 
+		//move back and set activeAction back to null and remove character from turnQueue
+		if(steppedForvard && turnQueue.first().isActFinished()) {
+			if(turnQueue.first() instanceof Skeleton) {
+				if(turnQueue.first().getX() < 700) {
+					turnQueue.first().move(dt);
+				} else {
+					steppedForvard = false;
+					activeAction = null;
+					actionFinished = false;
+					turnQueue.removeIndex(0);
+				}
+			}
+		}
+		
+	}
+
+	private void handleAi() {
+		enemyTarget = turnQueue.first().raffleTarget(playerCharacters);
+		activeAction = turnQueue.first().raffleSkillToUse();
+	}
+
+	private void doActivePlayerAction(float dt) {
+		//ACTION STEP: MOVE FORWARD -> DO ANIMATION -> MOVE BACKWARD
+		
+		//Move forward if character's x smaller than setted variable
 		if(!steppedForvard){
 			if(turnQueue.first().getX() < ACTIONMOVEMAX){
 				turnQueue.first().move(dt);	
 			}else {
 				steppedForvard = true;
-				turnQueue.first().setActFinished(false);
+				turnQueue.first().setActFinished(false);	//Se actFinished false so the animation will be played
 			}
 		}
 		
+		//When character has moved forvard do activeAction
+		if(steppedForvard && !actionFinished) {
+			activeAction.act(turnQueue.first(), target);
+			actionFinished = true;
+		}
+		
+		//If character has moved enough and attack-animation has been played 
+		//move back and set activeAction back to null and remove character from turnQueue
 		if(steppedForvard && turnQueue.first().isActFinished()) {
+			
 			if(turnQueue.first() instanceof Warrior) {
 				if(turnQueue.first().getX() > ORIGINALWARRIORX) {
 					turnQueue.first().moveBackward(dt);
 				} else {
 					steppedForvard = false;
-					animationPlayed = false;
 					activeAction = null;
+					actionFinished = false;
 					turnQueue.removeIndex(0);
 				}
-			}else if (turnQueue.first() instanceof Mage) {
+			} else if (turnQueue.first() instanceof Mage) {
 				if(turnQueue.first().getX() > ORIGINALMAGEX) {
 					turnQueue.first().moveBackward(dt);
 				} else {
 					steppedForvard = false;
-					animationPlayed = false;
 					activeAction = null;
+					actionFinished = false;
 					turnQueue.removeIndex(0);
 				}
-			}else if (turnQueue.first() instanceof Rogue) {
+			} else if (turnQueue.first() instanceof Rogue) {
 				if(turnQueue.first().getX() > ORIGINALROGUEX) {
 					turnQueue.first().moveBackward(dt);
 				} else {
 					steppedForvard = false;
-					animationPlayed = false;
 					activeAction = null;
 					turnQueue.removeIndex(0);
 				}
 			}
 		}
-	}
-
-	private void checkTarget() {
-		if(Gdx.input.justTouched()) {
-			for(Character e : enemies) {
-				if(Gdx.input.getX() > e.getX() && Gdx.input.getX() < e.getX() + e.getTexture().getWidth() && 
-					Game.HEIGHT - Gdx.input.getY() > e.getY() && Game.HEIGHT - Gdx.input.getY() < e.getY() + e.getTexture().getHeight()){
-						target = e;
-						System.out.println("Target set: "+ e.getClass().getSimpleName());
-				}
-			}
-		}		
 	}
 
 	private void countTurn(float dt) {
@@ -338,13 +368,13 @@ public class Battle extends GameState {
 				c.addCharge();
 				if(c.isCharged()) {
 					turnQueue.add(c);
-					System.out.print(c.getClass().getSimpleName()+" charged!");
+					System.out.println(c.getClass().getSimpleName()+" charged!");
 				}
 			}
 			for(Character c : enemies) {
 				c.addCharge();
 				if(c.isCharged()) {
-					//turnQueue.add(c);
+					turnQueue.add(c);
 					System.out.println("Skeleton charged");
 				}
 			}
@@ -621,6 +651,39 @@ public class Battle extends GameState {
 		for(Button b : mainButtons) {
 			b.setClickable(false);
 		}
+	}
+	
+	private void checkSubButtonHovering(Button clickedMainButton) {
+		//for hovering effect
+		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ATTACK) {
+			for(Button b2 : subAttackButtons){
+				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
+			}
+		}
+		
+		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.CAST) {
+			for(Button b2 : subCastButtons){
+				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
+			}
+		}
+		
+		if(clickedMainButton != null && clickedMainButton.getAction() == ButtonAction.ITEM) {
+			for(Button b2 : itemButtons){
+				b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY());
+			}
+		}
+	}
+	
+	private void checkIfTargetClicked() {
+		if(Gdx.input.justTouched()) {
+			for(Character e : enemies) {
+				if(Gdx.input.getX() > e.getX() && Gdx.input.getX() < e.getX() + e.getTexture().getWidth() && 
+					Game.HEIGHT - Gdx.input.getY() > e.getY() && Game.HEIGHT - Gdx.input.getY() < e.getY() + e.getTexture().getHeight()){
+						target = e;
+						System.out.println("Target set: "+ e.getClass().getSimpleName());
+				}
+			}
+		}		
 	}
 	
 	private void resetCharacters() {

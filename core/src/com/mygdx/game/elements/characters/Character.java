@@ -6,12 +6,14 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.elements.ai.Ai;
 import com.mygdx.game.elements.items.Equipment;
 import com.mygdx.game.elements.skills.Skill;
 
 
 public abstract class Character {
 	
+	protected Ai ai;
 	protected Texture texture;
 	protected TextureRegion[] textureReg;
 	protected Array<Equipment> equipment;
@@ -35,11 +37,6 @@ public abstract class Character {
 	protected boolean actFinished = true;
 	protected float elapsedTime = 0;
 	
-	public Character(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-	
 	public Character(int x, int y, float maxHp, float maxMana, float attackspeed, int strength, int agility, int intelligence) {
 		this.x = x;
 		this.y = y;
@@ -51,6 +48,20 @@ public abstract class Character {
 		this.strength = strength;
 		this.agility = agility;
 		this.intelligence = intelligence;
+	}
+	
+	public Character(int x, int y, float maxHp, float maxMana, float attackspeed, int strength, int agility, int intelligence, Ai ai) {
+		this.x = x;
+		this.y = y;
+		this.maxHp = maxHp;
+		this.hp = maxHp;
+		this.maxMana = maxMana;
+		this.mana = maxMana;
+		this.attackSpeed = attackspeed;
+		this.strength = strength;
+		this.agility = agility;
+		this.intelligence = intelligence;
+		this.ai = ai;
 	}
 	
 	public void render(SpriteBatch sb){
@@ -109,6 +120,14 @@ public abstract class Character {
 		tmp[8] = t3;
 		tmp[9] = t1;
 		actAnimation = new Animation(1/10f, tmp);
+	}
+	
+	public Skill raffleSkillToUse() {
+		return ai.raffleSkillToUse(attackAbilities, spells);
+	}
+
+	public Character raffleTarget(Array<Character> playerCharacters) {
+		return ai.raffleTarget(playerCharacters);
 	}
 	
 	public abstract void addEquipment(Equipment equipment);
