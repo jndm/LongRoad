@@ -69,22 +69,23 @@ public class Play extends GameState {
 	private void createItems() {
 		items = new Array<Item>();
 		Item potion = new Potion();
-		potion.addCount(3);
+		potion.addCount(1);
 		items.add(potion);
 		
 		Item potion2 = new Potion();
-		potion2.addCount(2);
+		potion2.addCount(1);
 		items.add(potion2);
-		
+		/*
 		Item potion3 = new Potion();
 		potion3.addCount(3);
 		items.add(potion3);
+		*/
 	}
 
 	private void createPlayerCharacters() {
-		warrior = new Warrior(100, 80, 120, 50, 30, 12, 8, 4);
-		mage = new Mage(20, 150, 80, 120, 20, 4, 10, 12);
-		rogue = new Rogue(20, 20, 100, 70, 20, 8, 12, 5);
+		warrior = new Warrior("Warrior", 100, 80, 120, 50, 30, 12, 8, 4);
+		mage = new Mage("Mage", 20, 150, 80, 120, 20, 4, 10, 12);
+		rogue = new Rogue("Rogue", 20, 20, 100, 70, 20, 8, 12, 5);
 		
 		warrior.setTexture((Texture)assets.get(WARRIOR_IMG));
 		mage.setTexture((Texture)assets.get(MAGE_IMG));
@@ -112,7 +113,7 @@ public class Play extends GameState {
 			Skeleton s;
 			Array<Character> enemies = new Array<Character>();
 			if(i < 17) { 
-				s = new Skeleton(700 + i * 700, 80, 80f, 120f, 10f, 4, 10, 12, skeletonAi);
+				s = new Skeleton(700 + i * 700, 80, 80f, 120f, 25f, 4, 10, 12, skeletonAi);
 				s.setTexture((Texture)assets.get(SKELETON_IMG));
 				//JUST FOR TESTING
 				s.createAttackAnimation(new TextureRegion((Texture)assets.get(WARRIOR_IMG), 0, 0, warrior.getTexture().getWidth(), warrior.getTexture().getHeight()), 

@@ -32,12 +32,14 @@ public abstract class Character {
 	protected float defaultAttackDmg;
 	protected Array<Skill> attackAbilities;
 	protected Array<Skill> spells;
+	protected String name;
 	
 	protected Animation actAnimation;
 	protected boolean actFinished = true;
 	protected float elapsedTime = 0;
 	
-	public Character(int x, int y, float maxHp, float maxMana, float attackspeed, int strength, int agility, int intelligence) {
+	public Character(String name, int x, int y, float maxHp, float maxMana, float attackspeed, int strength, int agility, int intelligence) {
+		this.name = name;
 		this.x = x;
 		this.y = y;
 		this.maxHp = maxHp;
@@ -186,5 +188,8 @@ public abstract class Character {
 
 	public Animation getActAnimation() { return actAnimation; }
 	public void setActAnimation(Animation actAnimation) { this.actAnimation = actAnimation; }
-	
+
+	public String getName() { return name; }
+	public void setName(String name) { this.name = name; }
+		
 }

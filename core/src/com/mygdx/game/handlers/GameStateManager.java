@@ -8,6 +8,7 @@ import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.items.Item;
 import com.mygdx.game.states.Battle;
 import com.mygdx.game.states.GameState;
+import com.mygdx.game.states.Mainmenu;
 import com.mygdx.game.states.Play;
 
 public class GameStateManager {
@@ -18,6 +19,7 @@ public class GameStateManager {
 	
 	public static final int PLAY = 1;
 	public static final int BATTLE = 2;
+	public static final int MAINMENU = 3;
 	
 	public GameStateManager(Game game) {
 		this.game = game;
@@ -48,6 +50,10 @@ public class GameStateManager {
 	
 	public void pushBattleState(int state, Array<Character> array, Array<Character> chars, Array<Item> items) {
 		gameStates.push(new Battle(this, array, chars, items)); 
+	}
+	
+	public void pushMainMenuState(int state, Array<Character> array, Array<Character> chars, Array<Item> items) {
+		gameStates.push(new Mainmenu(this, chars, items)); 
 	}
 	
 	public void pushState(int state) {

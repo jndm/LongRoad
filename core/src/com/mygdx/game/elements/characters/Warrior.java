@@ -11,9 +11,9 @@ import com.mygdx.game.elements.skills.spells.SpecialSpell;
 
 public class Warrior extends Character {
 	
-	public Warrior(int x, int y, float maxHp, float maxMana, float attackspeed,
+	public Warrior(String name, int x, int y, float maxHp, float maxMana, float attackspeed,
 			int strength, int agility, int intelligence) {
-		super(x, y, maxHp, maxMana, attackspeed, strength, agility, intelligence);
+		super(name, x, y, maxHp, maxMana, attackspeed, strength, agility, intelligence);
 		attackAbilities = new Array<Skill>();
 		attackAbilities.add(new DefaultAttack());
 		attackAbilities.add(new SpecialAttack());
@@ -67,6 +67,5 @@ public class Warrior extends Character {
 	public Array<Skill> getSpells() {
 		return spells;
 	}
-
 	
 }

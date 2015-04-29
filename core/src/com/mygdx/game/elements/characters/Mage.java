@@ -11,9 +11,9 @@ import com.mygdx.game.elements.skills.spells.SpecialSpell;
 
 public class Mage extends Character {
 	
-	public Mage(int x, int y, float maxHp, float maxMana, float attackspeed,
+	public Mage(String name, int x, int y, float maxHp, float maxMana, float attackspeed,
 			int strength, int agility, int intelligence) {
-		super(x, y, maxHp, maxMana, attackspeed, strength, agility, intelligence);
+		super(name, x, y, maxHp, maxMana, attackspeed, strength, agility, intelligence);
 		attackAbilities = new Array<Skill>();
 		attackAbilities.add(new DefaultAttack());
 		attackAbilities.add(new SpecialAttack());

@@ -24,20 +24,16 @@ import com.mygdx.game.helpers.ButtonAction;
 
 public class Battle extends GameState {
 	
-	private final int BUTTON_ROWS = 2;
-	private final int BUTTON_COLS = 2;
-	
 	private TextureRegion bg;
 	private Sprite itembg;
+	private Sprite mainbuttonbg;
 	
-	private Array<Sprite> healthBarbgs;
+	private Array<Sprite> barBgs;
 	private Array<Sprite> healthBarfills;
+	private Array<Sprite> manaBarfills;
 
 	//Buttons
 	private TextureAtlas atlas;
-	private TextureRegion[][] buttonsRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
-	private TextureRegion[][] notClickablebuttonsRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
-	private TextureRegion[][] clickedButtonRegion = new TextureRegion[BUTTON_ROWS][BUTTON_COLS];
 	
 	private Array<Button> mainButtons;
 	private Array<Button> subAttackButtons;
@@ -78,6 +74,7 @@ public class Battle extends GameState {
 	
 	//Final variables for images
 	private final String BACKGROUND_IMG 					= "background";
+	private final String MAINBUTTONBG_IMG					= "buttonsbackg";
 	
 	private final String SUBBUTTONTOP_IMG 					= "subButtonTop";
 	private final String SUBBUTTONMID_IMG 					= "subButtonMiddle";
@@ -89,18 +86,19 @@ public class Battle extends GameState {
 	private final String SUBBUTTONMID_NOTCLICKABLE_IMG 		= "subButtonMiddleNotClickable";
 	private final String SUBBUTTONBOTTOM_NOTCLICKABLE_IMG 	= "subButtonBottomNotClickable";
 
-	private final String BUTTONS_IMG 						= "buttons";
-	private final String CLICKED_BUTTONS_IMG 				= "clickedButtons";
-	private final String NOT_CLICKABLE_BUTTONS_IMG 			= "notClickableButtons";
-	
-	private final String ITEMBG_IMG 						= "itembg";
+	private final String BUTTONS_IMG 						= "mainButton";
+	private final String CLICKED_BUTTONS_IMG 				= "mainButtonClicked";
+	private final String NOT_CLICKABLE_BUTTONS_IMG 			= "mainButtonNotclickable";
 	
 	private final String HEALTHBARBG_IMG 					= "healthbarbg";
 	private final String HEALTHBARFILL_IMG 					= "healthbarfill";
+	private final String MANABARFILL_IMG 					= "manabarfill";
 	
 	private final String BATTLEATLAS						= "background/battle/battleassets.pack";
 	
-	private BitmapFont font = new BitmapFont();
+	private BitmapFont fpsfont = new BitmapFont();
+	private BitmapFont mainfont;
+	private BitmapFont subfont;
 	
 	public Battle(GameStateManager gsm) {
 		super(gsm);
@@ -117,8 +115,9 @@ public class Battle extends GameState {
 		
 		atlas = assets.get(BATTLEATLAS);
 		bg = atlas.findRegion(BACKGROUND_IMG);
-		healthBarbgs = new Array<Sprite>();
+		barBgs = new Array<Sprite>();
 		healthBarfills = new Array<Sprite>();
+		manaBarfills = new Array<Sprite>();
 
 		playerCharacters = chars;
 		
@@ -136,13 +135,7 @@ public class Battle extends GameState {
 		}
 		target = enemies.first();
 		initButtons();
-		
-		for(int i=0; i<playerCharacters.size; i++) {
-			healthBarbgs.add(new Sprite(atlas.findRegion(HEALTHBARBG_IMG)));
-			healthBarbgs.get(i).setPosition(playerCharacters.get(i).getX(), playerCharacters.get(i).getY() - healthBarbgs.get(0).getRegionHeight() - 5);
-			healthBarfills.add(new Sprite(atlas.findRegion(HEALTHBARFILL_IMG)));
-			healthBarfills.get(i).setPosition(playerCharacters.get(i).getX() + 1, 	playerCharacters.get(i).getY() - healthBarfills.get(0).getRegionHeight() - 6);
-		}
+		initHpAndManaBars();	
 		
 	}
 
@@ -154,7 +147,8 @@ public class Battle extends GameState {
 				clickedMainButton = b;
 			}
 		}
-		
+
+		checkIfTargetClicked();
 		checkSubButtonHovering(clickedMainButton);
 		
 		if(Gdx.input.justTouched()) {
@@ -185,15 +179,7 @@ public class Battle extends GameState {
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
 								b2.getItem().use(playerCharacters.get(WARRIOR));
 								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
-								if(b2.getItem().getCount() == 0) {	//If items count is 0, move next item higher in the items line
-									if(itemButtons.size > 1){
-										for(int i=itemButtons.indexOf(b2, true); i<itemButtons.size-1; i++){
-											itemButtons.get(i+1).setX(itemButtons.get(i).getX());
-											itemButtons.get(i+1).setY(itemButtons.get(i).getY());
-										}
-									}
-									itemButtons.removeValue(b2, true);
-								}
+								checkIfNoMoreItems(b2);
 								turnQueue.removeIndex(0);
 								b2.setClicked(false);
 							}
@@ -221,12 +207,12 @@ public class Battle extends GameState {
 			} 
 		}
 	}
-	
+
 	@Override
 	public void update(float dt) {
 		//If there is no action to be shown:
-		if(activeAction == null) {
-			if(turnQueue.size == 0) {
+		if(activeAction == null) { 
+			if(turnQueue.size == 0) {	// If no-one has turn, charge it
 				resetButtonClickable();
 				countTurn(dt);
 			} else {
@@ -255,7 +241,6 @@ public class Battle extends GameState {
 					handleAi();
 				}
 			}
-			checkIfTargetClicked();
 		}
 		//If there is an action to be shown wait for it to finish:
 		else {
@@ -389,6 +374,25 @@ public class Battle extends GameState {
 
 		sb.begin();
 			sb.draw(bg, 0, Game.HEIGHT - bg.getRegionHeight());
+			sb.draw(mainbuttonbg, 0, 0);
+			for(int i=0; i<playerCharacters.size; i++){
+				mainfont.draw(sb, playerCharacters.get(i).getName()+" ", 
+						mainbuttonbg.getWidth() * 0.52f, 
+						mainbuttonbg.getHeight() * (0.90f - i * 0.25f));
+				subfont.drawMultiLine(sb, playerCharacters.get(i).getHp()+"/"+playerCharacters.get(i).getMaxHp()+"\n"+playerCharacters.get(i).getMana()+"/"+playerCharacters.get(i).getMaxMana(), 
+						mainbuttonbg.getWidth() * 0.67f, 
+						mainbuttonbg.getHeight() * (0.91f - i * 0.25f));
+			}
+			int k=0;
+			for(int i=0; i<playerCharacters.size; i++) {
+				healthBarfills.get(i).setSize(62 * playerCharacters.get(i).getHp()/playerCharacters.get(i).getMaxHp(), healthBarfills.get(0).getHeight());
+				manaBarfills.get(i).setSize(62 * playerCharacters.get(i).getMana()/playerCharacters.get(i).getMaxMana(), healthBarfills.get(0).getHeight());
+				barBgs.get(k).draw(sb);
+				barBgs.get(k+1).draw(sb);
+				healthBarfills.get(i).draw(sb);
+				manaBarfills.get(i).draw(sb);
+				k = k+2;
+			}
 		sb.end();
 		
 		//Characters
@@ -414,9 +418,6 @@ public class Battle extends GameState {
 						}
 						break;
 					case ITEM:
-						sb.begin();
-						itembg.draw(sb);
-						sb.end();
 						for(Button b2 : itemButtons) {
 							b2.render(sb);
 						}
@@ -426,13 +427,6 @@ public class Battle extends GameState {
 						break;
 				}
 			}
-			sb.begin();	
-			for(int i=0; i<playerCharacters.size; i++) {
-				healthBarfills.get(i).setSize(62 * playerCharacters.get(i).getHp()/playerCharacters.get(i).getMaxHp(), healthBarfills.get(0).getHeight());
-				healthBarbgs.get(i).draw(sb);
-				healthBarfills.get(i).draw(sb);
-			}
-			sb.end();
 		}
 		
 		for(Character c : enemies) {
@@ -440,14 +434,15 @@ public class Battle extends GameState {
 		}
 		
 		sb.begin();
-			font.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 730, 470);
+			fpsfont.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 730, 470);
 		sb.end();
 	}
 	
 	@Override
 	public void dispose() {
 		assets.unload(BATTLEATLAS);
-		font.dispose();
+		fpsfont.dispose();
+		mainfont.dispose();
 		resetCharacters();
 	}
 	
@@ -472,28 +467,24 @@ public class Battle extends GameState {
 		mageCastButtons = new Array<Button>();
 		rogueCastButtons = new Array<Button>();
 		
-		buttonsRegion = atlas.findRegion(BUTTONS_IMG).split(400,104);
-		clickedButtonRegion = atlas.findRegion(CLICKED_BUTTONS_IMG).split(400, 104);
-		notClickablebuttonsRegion = atlas.findRegion(NOT_CLICKABLE_BUTTONS_IMG).split(400, 104);
+		mainbuttonbg = new Sprite(atlas.findRegion(MAINBUTTONBG_IMG));
+		mainbuttonbg.setPosition(0, 0);
+		TextureRegion[] mainButtonsRegion = new TextureRegion[3];
+		mainButtonsRegion[0] = atlas.findRegion(BUTTONS_IMG);
+		mainButtonsRegion[1] = atlas.findRegion(CLICKED_BUTTONS_IMG);
+		mainButtonsRegion[2] = atlas.findRegion(NOT_CLICKABLE_BUTTONS_IMG);
 		
 		//Creating button main buttons
-		int k=0;
-		for(int i=0; i<BUTTON_ROWS; i++) {
-			for(int j=0; j<BUTTON_COLS; j++) {
-				mainButtons.add(new Button(j * buttonsRegion[i][j].getRegionWidth(), 
-						buttonsRegion[i][j].getRegionHeight() - i * buttonsRegion[i][j].getRegionHeight(), 
-						buttonsRegion[i][j].getRegionWidth(), 
-						buttonsRegion[i][j].getRegionHeight(),
-						ButtonAction.values()[k].toString(),
-						ButtonAction.values()[k],
-						mainfont));
-				TextureRegion[] tmp = new TextureRegion[3];
-				tmp[0] = buttonsRegion[i][j];
-				tmp[1] = clickedButtonRegion[i][j];
-				tmp[2] = notClickablebuttonsRegion[i][j];
-				mainButtons.get(k).setTextureRegion(tmp);
-				k++;
-			}
+		for(int i=0; i<4; i++) {
+			mainButtons.add(new Button(0, 
+					(3-i) * mainButtonsRegion[0].getRegionHeight(), 
+					mainButtonsRegion[0].getRegionWidth(), 
+					mainButtonsRegion[0].getRegionHeight(),
+					ButtonAction.values()[i].toString(),
+					ButtonAction.values()[i],
+					mainfont));
+
+			mainButtons.get(i).setTextureRegion(mainButtonsRegion);
 		}
 
 		TextureRegion[] subBtop = new TextureRegion[3];
@@ -508,14 +499,14 @@ public class Battle extends GameState {
 		subBmid[2] = atlas.findRegion(SUBBUTTONMID_NOTCLICKABLE_IMG);
 		subBbot[0] = atlas.findRegion(SUBBUTTONBOTTOM_IMG);
 		subBbot[1] = atlas.findRegion(SUBBUTTONBOTTOMHOVER_IMG);
-		subBbot[2] = atlas.findRegion(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG);
+		subBbot[2] = atlas.findRegion(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG);		
 		
 		//Create character's attack and cast buttons
 		for(int j=0; j<playerCharacters.size; j++) {
 			for(int i=0; i<playerCharacters.get(j).getAttackAbilities().size; i++) {
 				//Warrior attack buttons
 				if(playerCharacters.get(j) instanceof Warrior) { 
-					warriorAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
+					warriorAttackButtons.add(new Button(mainButtons.get(0).getWidth()/2, 
 							(playerCharacters.get(j).getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/playerCharacters.get(j).getAttackAbilities().size, 
 							subBtop[0].getRegionWidth(), 
 							subBtop[0].getRegionHeight(), 
@@ -533,7 +524,7 @@ public class Battle extends GameState {
 				} 
 				//Mage attack buttons:
 				else if(playerCharacters.get(j) instanceof Mage) {
-					mageAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
+					mageAttackButtons.add(new Button(mainButtons.get(0).getWidth()/2, 
 							(playerCharacters.get(j).getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/playerCharacters.get(j).getAttackAbilities().size, 
 							subBtop[0].getRegionWidth(), 
 							subBtop[0].getRegionHeight(), 
@@ -551,7 +542,7 @@ public class Battle extends GameState {
 				} 
 				//Rogue attack buttons:
 				else if(playerCharacters.get(j) instanceof Rogue) {
-					rogueAttackButtons.add(new Button(mainButtons.get(0).getWidth() - subBtop[0].getRegionWidth() - 20, 
+					rogueAttackButtons.add(new Button(mainButtons.get(0).getWidth()/2, 
 							(playerCharacters.get(j).getAttackAbilities().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(0).getY()/playerCharacters.get(j).getAttackAbilities().size, 
 							subBtop[0].getRegionWidth(), 
 							subBtop[0].getRegionHeight(), 
@@ -572,7 +563,7 @@ public class Battle extends GameState {
 			for(int i=0; i<playerCharacters.get(j).getSpells().size; i++) {
 				//Warrior cast buttons:
 				if(playerCharacters.get(j) instanceof Warrior) { 
-					warriorCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
+					warriorCastButtons.add(new Button(mainButtons.get(1).getWidth()/2, 
 							(playerCharacters.get(j).getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/playerCharacters.get(j).getSpells().size, 
 							subBtop[0].getRegionWidth(), 
 							subBtop[0].getRegionHeight(), 
@@ -590,7 +581,7 @@ public class Battle extends GameState {
 				} 
 				//Mage cast buttons:
 				else if(playerCharacters.get(j) instanceof Mage) { 
-					mageCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
+					mageCastButtons.add(new Button(mainButtons.get(1).getWidth()/2, 
 							(playerCharacters.get(j).getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/playerCharacters.get(j).getSpells().size, 
 							subBtop[0].getRegionWidth(), 
 							subBtop[0].getRegionHeight(), 
@@ -608,7 +599,7 @@ public class Battle extends GameState {
 				} 
 				//Rogue cast buttons:
 				else if(playerCharacters.get(j) instanceof Rogue) { 
-					rogueCastButtons.add(new Button(mainButtons.get(1).getX() + 20, 
+					rogueCastButtons.add(new Button(mainButtons.get(1).getWidth()/2, 
 							(playerCharacters.get(j).getSpells().size - i) * subBtop[0].getRegionHeight() + mainButtons.get(1).getY()/playerCharacters.get(j).getSpells().size, 
 							subBtop[0].getRegionWidth(), 
 							subBtop[0].getRegionHeight(), 
@@ -628,22 +619,58 @@ public class Battle extends GameState {
 		}
 		
 		//Item buttons:
-		//BG:
-		itembg = new Sprite(atlas.findRegion(ITEMBG_IMG));
-		itembg.setPosition(mainButtons.get(2).getWidth()/4, mainButtons.get(2).getHeight()/2);
 		
 		//Buttons:
 		itemButtons = new Array<Button>();
 		for(int i=0; i<items.size; i++) {
-			itemButtons.add(new Button((int)itembg.getX(), 
-					(int)itembg.getY() + (int)itembg.getRegionHeight() - ((i+1) * subBtop[0].getRegionHeight()), 
+			itemButtons.add(new Button(mainButtons.get(2).getWidth()/2, 
+					(items.size - i) * subBtop[0].getRegionHeight() + mainButtons.get(2).getY()/items.size, 
 					subBtop[0].getRegionWidth(), 
 					subBtop[0].getRegionHeight(), 
 					items.get(i).toString()+" x"+items.get(i).getCount(),
 					items.get(i),
 					subfont));
 			
-			itemButtons.get(i).setTextureRegion(subBmid);
+			if(i == 0 && items.size > 1) {
+				itemButtons.get(i).setTextureRegion(subBtop);
+			} else if(i < items.size-1 || items.size == 1){
+				itemButtons.get(i).setTextureRegion(subBmid);
+			} else {
+				itemButtons.get(i).setTextureRegion(subBbot);
+			}
+		}
+	}
+	
+	private void initHpAndManaBars() {
+		//Font for hp
+		Texture fonttexture = new Texture(Gdx.files.internal("fonts/main.png"));
+		fonttexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		mainfont = new BitmapFont(Gdx.files.internal("fonts/main.fnt"), new TextureRegion(fonttexture), false);
+		fonttexture = new Texture(Gdx.files.internal("fonts/sub.png"));
+		fonttexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		subfont = new BitmapFont(Gdx.files.internal("fonts/sub.fnt"), new TextureRegion(fonttexture), false);
+		
+		int k=0;
+		for(int i=0; i<playerCharacters.size; i++) {
+			barBgs.add(new Sprite(atlas.findRegion(HEALTHBARBG_IMG)));
+			barBgs.get(k).setPosition(mainbuttonbg.getWidth() * 0.80f, 
+					mainbuttonbg.getHeight() * (0.90f - i * 0.25f) - barBgs.get(k).getHeight());
+			
+			healthBarfills.add(new Sprite(atlas.findRegion(HEALTHBARFILL_IMG)));
+			healthBarfills.get(i).setPosition(barBgs.get(k).getX() + 1,
+					barBgs.get(k).getY() + 1);
+			
+			k++;
+			
+			barBgs.add(new Sprite(atlas.findRegion(HEALTHBARBG_IMG)));
+			barBgs.get(k).setPosition(mainbuttonbg.getWidth() * 0.80f, 
+					barBgs.get(k-1).getY() - barBgs.get(k).getHeight());
+			
+			manaBarfills.add(new Sprite(atlas.findRegion(MANABARFILL_IMG)));
+			manaBarfills.get(i).setPosition(barBgs.get(k).getX() + 1,
+					barBgs.get(k).getY() + 1);
+			
+			k++;
 		}
 	}
 	
@@ -674,11 +701,46 @@ public class Battle extends GameState {
 		}
 	}
 	
+	private void checkIfNoMoreItems(Button b2) {
+		if(b2.getItem().getCount() == 0) {	//If items count is 0, reset item button line
+			itemButtons.removeValue(b2, true);
+			
+			TextureRegion[] subBtop = new TextureRegion[3];
+			TextureRegion[] subBmid = new TextureRegion[3];
+			TextureRegion[] subBbot = new TextureRegion[3];
+			
+			subBtop[0] = atlas.findRegion(SUBBUTTONTOP_IMG);
+			subBtop[1] = atlas.findRegion(SUBBUTTONTOPHOVER_IMG);
+			subBtop[2] = atlas.findRegion(SUBBUTTONTOP_NOTCLICKABLE_IMG);
+			subBmid[0] = atlas.findRegion(SUBBUTTONMID_IMG);
+			subBmid[1] = atlas.findRegion(SUBBUTTONMIDHOVER_IMG);
+			subBmid[2] = atlas.findRegion(SUBBUTTONMID_NOTCLICKABLE_IMG);
+			subBbot[0] = atlas.findRegion(SUBBUTTONBOTTOM_IMG);
+			subBbot[1] = atlas.findRegion(SUBBUTTONBOTTOMHOVER_IMG);
+			subBbot[2] = atlas.findRegion(SUBBUTTONBOTTOM_NOTCLICKABLE_IMG);	
+			
+			for(int i=0; i<itemButtons.size; i++) {
+				itemButtons.get(i).setX(mainButtons.get(2).getWidth()/2); 
+				itemButtons.get(i).setY((itemButtons.size - i) * subBtop[0].getRegionHeight() + mainButtons.get(2).getY()/itemButtons.size); 
+				
+				if(i == 0 && itemButtons.size > 1) {
+					itemButtons.get(i).setTextureRegion(subBtop);
+				} else if(i < itemButtons.size-1 || itemButtons.size == 1){
+					itemButtons.get(i).setTextureRegion(subBmid);
+				} else {
+					itemButtons.get(i).setTextureRegion(subBbot);
+				}
+			}
+		}
+	}
+	
 	private void checkIfTargetClicked() {
 		if(Gdx.input.justTouched()) {
 			for(Character e : enemies) {
-				if(Gdx.input.getX() > e.getX() && Gdx.input.getX() < e.getX() + e.getTexture().getWidth() && 
-					Game.HEIGHT - Gdx.input.getY() > e.getY() && Game.HEIGHT - Gdx.input.getY() < e.getY() + e.getTexture().getHeight()){
+				if(Gdx.input.getX() > e.getX() 
+					&& Gdx.input.getX() < e.getX() + e.getTexture().getWidth() 
+					&& Game.HEIGHT - Gdx.input.getY() > e.getY() 
+					&& Game.HEIGHT - Gdx.input.getY() < e.getY() + e.getTexture().getHeight()) {
 						target = e;
 						System.out.println("Target set: "+ e.getClass().getSimpleName());
 				}
