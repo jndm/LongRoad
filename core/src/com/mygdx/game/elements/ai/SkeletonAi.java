@@ -12,8 +12,12 @@ public class SkeletonAi implements Ai{
 	}
 
 	@Override
-	public Character raffleTarget(Array<Character> playerCharacters) {		
-		return playerCharacters.get((int)(Math.random() * playerCharacters.size));
+	public Character raffleTarget(Array<Character> playerCharacters) {
+		Character target = playerCharacters.get((int)(Math.random() * playerCharacters.size));
+		while (!target.isAlive()){
+			target = playerCharacters.get((int)(Math.random() * playerCharacters.size));
+		}
+		return target;
 	}
 
 }

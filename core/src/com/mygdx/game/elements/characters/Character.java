@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.elements.ai.Ai;
 import com.mygdx.game.elements.items.Equipment;
@@ -14,8 +15,7 @@ import com.mygdx.game.elements.skills.Skill;
 public abstract class Character {
 	
 	protected Ai ai;
-	protected Texture texture;
-	protected TextureRegion[] textureReg;
+	protected TextureRegion textureReg;
 	protected Array<Equipment> equipment;
 	protected float x, y;
 	protected float movementSpeed = 100;
@@ -33,9 +33,11 @@ public abstract class Character {
 	protected Array<Skill> attackAbilities;
 	protected Array<Skill> spells;
 	protected String name;
+	protected Vector2 battleposition;
+	protected boolean alive = true;
 	
-	protected Animation actAnimation;
-	protected boolean actFinished = true;
+	protected Animation attackAnimation, moveAnimation;
+	protected boolean attacking = false, moving = false;
 	protected float elapsedTime = 0;
 	
 	public Character(String name, int x, int y, float maxHp, float maxMana, float attackspeed, int strength, int agility, int intelligence) {
@@ -68,30 +70,34 @@ public abstract class Character {
 	
 	public void render(SpriteBatch sb){
 		sb.begin();	
-		if(!actFinished) {
+		if(attacking) {
 			elapsedTime += Gdx.graphics.getDeltaTime();
-			sb.draw(actAnimation.getKeyFrame(elapsedTime, false), x, y);
-			if(actAnimation.isAnimationFinished(elapsedTime)) {
-				actFinished = true;
-				elapsedTime = 0;
+			sb.draw(attackAnimation.getKeyFrame(elapsedTime, false), x, y);
+			if(attackAnimation.isAnimationFinished(elapsedTime)) {
+				attacking = false;
 			}
-		} else {
-			sb.draw(texture, x, y);
+		} else if(moving) {
+			elapsedTime += Gdx.graphics.getDeltaTime();
+			sb.draw(moveAnimation.getKeyFrame(elapsedTime, true), x, y);
+		}else {
+			sb.draw(textureReg, x, y);
 		}
 		sb.end();
 	}
 	
 	public void render(SpriteBatch sb, int _x, int _y){
 		sb.begin();
-		sb.draw(texture, _x, _y);
+		sb.draw(textureReg, _x, _y);
 		sb.end();
 	}
 	
 	public void move(float dt){
+		moving = true;
 		x += movementSpeed * dt;
 	}
 	
 	public void moveBackward(float dt){
+		moving = true;
 		x -= movementSpeed * dt;
 	}
 	
@@ -121,7 +127,11 @@ public abstract class Character {
 		tmp[7] = t2;
 		tmp[8] = t3;
 		tmp[9] = t1;
-		actAnimation = new Animation(1/10f, tmp);
+		attackAnimation = new Animation(1/10f, tmp);
+	}
+	
+	public void createMovingAnimation(TextureRegion[] tr) {
+		moveAnimation = new Animation(1/10f, tr);
 	}
 	
 	public Skill raffleSkillToUse() {
@@ -132,10 +142,15 @@ public abstract class Character {
 		return ai.raffleTarget(playerCharacters);
 	}
 	
-	public abstract void addEquipment(Equipment equipment);
+	public void addAttackAbility(Skill ability) {
+		attackAbilities.add(ability);
+	}
+	public void addSpell(Skill ability) {
+		spells.add(ability);
+	}
 	
-	public void setTexture(Texture t){ texture = t; }
-	public Texture getTexture() { return texture; }
+	public void setTextureRegion(TextureRegion t){ textureReg = t; }
+	public TextureRegion getTextureRegion() { return textureReg; }
 	
 	public void setX(float x) { this.x = x; }
 	public void setY(float y) { this.y = y; }
@@ -183,13 +198,33 @@ public abstract class Character {
 	public int getIntelligence() { return intelligence; }
 	public void setIntelligence(int intelligence) { this.intelligence = intelligence; }
 
-	public boolean isActFinished() { return actFinished; }
-	public void setActFinished(boolean actfinished) { this.actFinished = actfinished; }
+	public boolean isAttacking() { return attacking; }
+	
+	public void setAttacking(boolean attacking) {
+		if(attacking) {
+			elapsedTime = 0;
+		}
+		this.attacking = attacking; 
+	}
 
-	public Animation getActAnimation() { return actAnimation; }
-	public void setActAnimation(Animation actAnimation) { this.actAnimation = actAnimation; }
+	public Animation getActAnimation() { return attackAnimation; }
+	public void setActAnimation(Animation actAnimation) { this.attackAnimation = actAnimation; }
 
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
+
+	public Vector2 getBattleposition() { return battleposition; }
+	public void setBattleposition(Vector2 battleposition) { this.battleposition = battleposition; }
+
+	public boolean isAlive() { return alive; }
+	public void setAlive(boolean alive) { this.alive = alive;}
+
+	public boolean isMoving() { return moving; }
+	public void setMoving(boolean moving) { 
+		if(moving) {
+			elapsedTime = 0;
+		}
+		this.moving = moving; 
+	}
 		
 }

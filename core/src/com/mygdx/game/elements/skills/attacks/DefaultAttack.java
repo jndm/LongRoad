@@ -4,25 +4,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.elements.skills.Skill;
 import com.mygdx.game.elements.characters.Character;
 
-public class DefaultAttack implements Skill{
+public class DefaultAttack extends Skill{
 
 	@Override
 	public void act(Character actor, Character target) {
-		float damage = actor.getStrength();
-		float targetHp = target.getHp() - damage;
+		this.dmg = actor.getStrength();
+		float targetHp = target.getHp() - this.dmg;
 		target.setHp(targetHp);
 		System.out.println("Doing defaultattack on "+target.getClass().getSimpleName());
+		startAnimation(target);
 	}
 	
 	@Override
 	public String toString() {
 		return "Defaultattack";
-	}
-
-	@Override
-	public void render(SpriteBatch sb, Character target) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

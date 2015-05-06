@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.items.Item;
 import com.mygdx.game.elements.skills.Skill;
+import com.mygdx.game.helpers.MainmenuButtonActions.SideButtonAction;
 
 public class Button {
 	private int x;
@@ -14,6 +15,7 @@ public class Button {
 	private int height;
 	private ButtonAction action;
 	private Skill action2;
+	private SideButtonAction sideButtonAction;
 	private Item item;
 	private TextureRegion[] texture = new TextureRegion[3];
 	private boolean clicked = false;
@@ -54,6 +56,17 @@ public class Button {
 		this.width = width;
 		this.height = height;
 		this.item = item;
+		this.text = text;
+		this.font = font;
+	}
+	
+	//Constructor for mainmenu sidebuttons
+	public Button(int x, int y, int width, int height, String text, SideButtonAction action, BitmapFont font) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.sideButtonAction = action;
 		this.text = text;
 		this.font = font;
 	}
@@ -195,6 +208,14 @@ public class Button {
 
 	public void setItem(Item item) {
 		this.item = item;
+	}
+
+	public SideButtonAction getSideButtonAction() {
+		return sideButtonAction;
+	}
+
+	public void setSideButtonAction(SideButtonAction sideButtonAction) {
+		this.sideButtonAction = sideButtonAction;
 	}
 	
 	

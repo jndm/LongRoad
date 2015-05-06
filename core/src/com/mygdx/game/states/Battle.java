@@ -25,8 +25,8 @@ import com.mygdx.game.helpers.ButtonAction;
 public class Battle extends GameState {
 	
 	private TextureRegion bg;
-	private Sprite itembg;
 	private Sprite mainbuttonbg;
+	private TextureRegion pointer;
 	
 	private Array<Sprite> barBgs;
 	private Array<Sprite> healthBarfills;
@@ -65,12 +65,11 @@ public class Battle extends GameState {
 	private float timeElapsed = 0;
 	private Skill activeAction;
 	private final int ACTIONMOVEMAX = 300;
-	private final float ORIGINALMAGEX = 20;
-	private final float ORIGINALWARRIORX = 100;
-	private final float ORIGINALROGUEX = 20;
 	private boolean steppedForvard = false;
 	private boolean actionFinished = false;
 	private boolean playersTurn = false;
+	private int deadPlayerCharacters = 0;
+	private int deadEnemies = 0;
 	
 	//Final variables for images
 	private final String BACKGROUND_IMG 					= "background";
@@ -93,6 +92,8 @@ public class Battle extends GameState {
 	private final String HEALTHBARBG_IMG 					= "healthbarbg";
 	private final String HEALTHBARFILL_IMG 					= "healthbarfill";
 	private final String MANABARFILL_IMG 					= "manabarfill";
+	
+	private final String POINTER_IMG						= "pointer";
 	
 	private final String BATTLEATLAS						= "background/battle/battleassets.pack";
 	
@@ -118,26 +119,26 @@ public class Battle extends GameState {
 		barBgs = new Array<Sprite>();
 		healthBarfills = new Array<Sprite>();
 		manaBarfills = new Array<Sprite>();
+		pointer = atlas.findRegion(POINTER_IMG);
 
 		playerCharacters = chars;
 		
-		oldMagePosition = new Vector2(playerCharacters.get(MAGE).getX(), playerCharacters.get(MAGE).getY());
-		oldWarriorPosition = new Vector2(playerCharacters.get(WARRIOR).getX(), playerCharacters.get(WARRIOR).getY());
-		oldRoguePosition = new Vector2(playerCharacters.get(ROGUE).getX(), playerCharacters.get(ROGUE).getY());
+		oldMagePosition 	= new Vector2(playerCharacters.get(MAGE).getX(), 		playerCharacters.get(MAGE).getY());
+		oldWarriorPosition 	= new Vector2(playerCharacters.get(WARRIOR).getX(), 	playerCharacters.get(WARRIOR).getY());
+		oldRoguePosition 	= new Vector2(playerCharacters.get(ROGUE).getX(), 		playerCharacters.get(ROGUE).getY());
 		
-		playerCharacters.get(MAGE).setXY(ORIGINALMAGEX, 300);
-		playerCharacters.get(WARRIOR).setXY(ORIGINALWARRIORX, 250);
-		playerCharacters.get(ROGUE).setXY(ORIGINALROGUEX, 228);
+		playerCharacters.get(MAGE).setXY(playerCharacters.get(MAGE).getBattleposition().x, 			playerCharacters.get(MAGE).getBattleposition().y);
+		playerCharacters.get(WARRIOR).setXY(playerCharacters.get(WARRIOR).getBattleposition().x, 	playerCharacters.get(WARRIOR).getBattleposition().y);
+		playerCharacters.get(ROGUE).setXY(playerCharacters.get(ROGUE).getBattleposition().x, 		playerCharacters.get(ROGUE).getBattleposition().y);
 		
-		for(Character c : enemies) {
-			c.setX(700);
-			c.setY(c.getY() + 190);
-		}
-		target = enemies.first();
+		initEnemies();
+		target = this.enemies.first();
 		initButtons();
-		initHpAndManaBars();	
+		initHpAndManaBars();
 		
 	}
+
+	
 
 	private void handleInput() {
 		Button clickedMainButton = null;
@@ -167,8 +168,7 @@ public class Battle extends GameState {
 					case CAST:
 						for(Button b2 : subCastButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								
-								turnQueue.removeIndex(0);
+								activeAction = b2.getAction2();
 								b2.setClicked(false);
 							}
 						}
@@ -177,16 +177,13 @@ public class Battle extends GameState {
 					case ITEM:
 						for(Button b2 : itemButtons){
 							if(b2.isMouseOnButton(Gdx.input.getX(), Gdx.input.getY())) {
-								b2.getItem().use(playerCharacters.get(WARRIOR));
+								b2.getItem().use(turnQueue.first());
 								b2.setText(b2.getItem().toString() + " x" + b2.getItem().getCount());
 								checkIfNoMoreItems(b2);
 								turnQueue.removeIndex(0);
 								b2.setClicked(false);
 							}
 						}
-						break;
-						
-					case RUN:
 						break;
 						
 				default:
@@ -210,58 +207,72 @@ public class Battle extends GameState {
 
 	@Override
 	public void update(float dt) {
-		//If there is no action to be shown:
-		if(activeAction == null) { 
+		if(activeAction == null) { //If there is no action to be shown:
 			if(turnQueue.size == 0) {	// If no-one has turn, charge it
 				resetButtonClickable();
 				countTurn(dt);
+				turnQueue.shrink(); //For memory management
 			} else {
-				if(turnQueue.first() instanceof Warrior) {
-					subAttackButtons = warriorAttackButtons;
-					subCastButtons = warriorCastButtons;
-					playersTurn = true;
-				}else if (turnQueue.first() instanceof Mage) {
-					subAttackButtons = mageAttackButtons;
-					subCastButtons = mageCastButtons;
-					playersTurn = true;
-				}else if (turnQueue.first() instanceof Rogue) {
-					subAttackButtons = rogueAttackButtons;
-					subCastButtons = rogueCastButtons;
-					playersTurn = true;
+				if(!turnQueue.first().isAlive()) {	//check if character is alive because it may have charged before it died
+					turnQueue.removeIndex(0);
 				} else {
-					playersTurn = false;
-				}
-				if(playersTurn) {
-					for(Button b : mainButtons) {
-						b.setClickable(true);
-					}	
-					handleInput();
-				} else {
-					resetButtonClickable();
-					handleAi();
+					if(turnQueue.first() instanceof Warrior) {
+						subAttackButtons = warriorAttackButtons;
+						subCastButtons = warriorCastButtons;
+						playersTurn = true;
+					}else if (turnQueue.first() instanceof Mage) {
+						subAttackButtons = mageAttackButtons;
+						subCastButtons = mageCastButtons;
+						playersTurn = true;
+					}else if (turnQueue.first() instanceof Rogue) {
+						subAttackButtons = rogueAttackButtons;
+						subCastButtons = rogueCastButtons;
+						playersTurn = true;
+					} else {
+						playersTurn = false;
+					}
+					
+					if(playersTurn) {
+						for(Button b : mainButtons) {
+							b.setClickable(true);
+						}	
+						handleInput();
+					} else {
+						resetButtonClickable();
+						handleAi();
+					}
 				}
 			}
-		}
-		//If there is an action to be shown wait for it to finish:
-		else {
+		}		
+		else { //If there is an action to be shown wait for it to finish:
 			if(playersTurn) {
-				doActivePlayerAction(dt);
-			} else {
+				doActivePlayerAction(dt);			
+			} 
+			else {
 				doActiveEnemyAction(dt);
 			}
 		}
 	}
 
+	private void swapTarget() {
+		for(int i=0; i<enemies.size; i++) {
+			if(enemies.get(i).isAlive()) {
+				target = enemies.get(i);
+				break;
+			}
+		}
+	}
+
 	private void doActiveEnemyAction(float dt) {
-		//ACTION STEP: MOVE FORWARD -> DO ANIMATION -> MOVE BACKWARD
-		
+		//ACTION STEP: MOVE FORWARD -> DO ANIMATION -> CHECK IF PLAYERCHAR IS DEAD -> MOVE BACK -> CHECK IF ALL PLAYERCHARS ARE DEAD AND LOSE	
 		//Move forward if character's x smaller than setted variable
 		if(!steppedForvard){
 			if(turnQueue.first().getX() > Game.WIDTH - ACTIONMOVEMAX){
 				turnQueue.first().moveBackward(dt);	
 			}else {
 				steppedForvard = true;
-				turnQueue.first().setActFinished(false);	//Se actFinished false so the animation will be played
+				turnQueue.first().setMoving(false);
+				turnQueue.first().setAttacking(true);	//Se attacking true so the animation will be played
 			}
 		}
 		
@@ -273,15 +284,19 @@ public class Battle extends GameState {
 		
 		//If character has moved enough and attack-animation has been played 
 		//move back and set activeAction back to null and remove character from turnQueue
-		if(steppedForvard && turnQueue.first().isActFinished()) {
-			if(turnQueue.first() instanceof Skeleton) {
-				if(turnQueue.first().getX() < 700) {
-					turnQueue.first().move(dt);
-				} else {
-					steppedForvard = false;
-					activeAction = null;
-					actionFinished = false;
-					turnQueue.removeIndex(0);
+		if(steppedForvard && !turnQueue.first().isAttacking()) {
+			if(enemyTarget.isAlive() && enemyTarget.getHp() < 0) {						//Check if playercharacter died
+				System.out.println(enemyTarget.getClass().getSimpleName() + "died!");
+				enemyTarget.setAlive(false);
+				deadPlayerCharacters++;
+			}
+			if(turnQueue.first().getX() < turnQueue.first().getBattleposition().x) {
+				turnQueue.first().move(dt);
+			} else {
+				resetAction();
+				if(deadPlayerCharacters == playerCharacters.size) {	//If all characters are dead 
+					System.out.println("YOU ARE DEAD!");
+					gsm.popState();
 				}
 			}
 		}
@@ -294,15 +309,15 @@ public class Battle extends GameState {
 	}
 
 	private void doActivePlayerAction(float dt) {
-		//ACTION STEP: MOVE FORWARD -> DO ANIMATION -> MOVE BACKWARD
-		
+		//ACTION STEPS: MOVE FORWARD -> DO ANIMATION -> CHECK IF ENEMY IS DEAD -> MOVE BACK -> CHECK IF ALL ENEMIES ARE DEAD AND WIN	
 		//Move forward if character's x smaller than setted variable
 		if(!steppedForvard){
 			if(turnQueue.first().getX() < ACTIONMOVEMAX){
 				turnQueue.first().move(dt);	
 			}else {
 				steppedForvard = true;
-				turnQueue.first().setActFinished(false);	//Se actFinished false so the animation will be played
+				turnQueue.first().setMoving(false);
+				turnQueue.first().setAttacking(true);	//Set actFinished false so the animation will be played
 			}
 		}
 		
@@ -314,53 +329,52 @@ public class Battle extends GameState {
 		
 		//If character has moved enough and attack-animation has been played 
 		//move back and set activeAction back to null and remove character from turnQueue
-		if(steppedForvard && turnQueue.first().isActFinished()) {
-			
-			if(turnQueue.first() instanceof Warrior) {
-				if(turnQueue.first().getX() > ORIGINALWARRIORX) {
-					turnQueue.first().moveBackward(dt);
-				} else {
-					steppedForvard = false;
-					activeAction = null;
-					actionFinished = false;
-					turnQueue.removeIndex(0);
-				}
-			} else if (turnQueue.first() instanceof Mage) {
-				if(turnQueue.first().getX() > ORIGINALMAGEX) {
-					turnQueue.first().moveBackward(dt);
-				} else {
-					steppedForvard = false;
-					activeAction = null;
-					actionFinished = false;
-					turnQueue.removeIndex(0);
-				}
-			} else if (turnQueue.first() instanceof Rogue) {
-				if(turnQueue.first().getX() > ORIGINALROGUEX) {
-					turnQueue.first().moveBackward(dt);
-				} else {
-					steppedForvard = false;
-					activeAction = null;
-					turnQueue.removeIndex(0);
+		if(steppedForvard && !turnQueue.first().isAttacking()) {
+			if(target.isAlive() && target.getHp() < 0) {						//Check if enemy died
+					System.out.println(target.getClass().getSimpleName() + "died!");
+					target.setAlive(false);
+					deadEnemies++;
+					swapTarget();
+			}
+			if(turnQueue.first().getX() > turnQueue.first().getBattleposition().x) {
+				turnQueue.first().moveBackward(dt);
+			} else {
+				resetAction();				
+				if(deadEnemies == enemies.size) {	//If all enemies are dead win battle
+					System.out.println("WINNER!");
+					gsm.popState();
 				}
 			}
 		}
+	}
+
+	private void resetAction() {
+		turnQueue.first().setMoving(false);
+		steppedForvard = false;
+		activeAction = null;
+		actionFinished = false;
+		turnQueue.removeIndex(0);
 	}
 
 	private void countTurn(float dt) {
 		timeElapsed += dt;
 		if(WAIT_TIME <= timeElapsed) {
 			for(Character c : playerCharacters) {
-				c.addCharge();
-				if(c.isCharged()) {
-					turnQueue.add(c);
-					System.out.println(c.getClass().getSimpleName()+" charged!");
+				if(c.isAlive()) {
+					c.addCharge();
+					if(c.isCharged()) {
+						turnQueue.add(c);
+						System.out.println(c.getClass().getSimpleName()+" charged!");
+					}
 				}
 			}
 			for(Character c : enemies) {
-				c.addCharge();
-				if(c.isCharged()) {
-					turnQueue.add(c);
-					System.out.println("Skeleton charged");
+				if(c.isAlive()) {
+					c.addCharge();
+					if(c.isCharged()) {
+						turnQueue.add(c);
+						System.out.println("Skeleton charged");
+					}
 				}
 			}
 			timeElapsed -= WAIT_TIME;
@@ -380,7 +394,7 @@ public class Battle extends GameState {
 						mainbuttonbg.getWidth() * 0.52f, 
 						mainbuttonbg.getHeight() * (0.90f - i * 0.25f));
 				subfont.drawMultiLine(sb, playerCharacters.get(i).getHp()+"/"+playerCharacters.get(i).getMaxHp()+"\n"+playerCharacters.get(i).getMana()+"/"+playerCharacters.get(i).getMaxMana(), 
-						mainbuttonbg.getWidth() * 0.67f, 
+						mainbuttonbg.getWidth() * 0.7f, 
 						mainbuttonbg.getHeight() * (0.91f - i * 0.25f));
 			}
 			int k=0;
@@ -432,6 +446,19 @@ public class Battle extends GameState {
 		for(Character c : enemies) {
 			c.render(sb);
 		}
+		sb.begin();
+			sb.draw(pointer, target.getX() + target.getTextureRegion().getRegionWidth()/2 - pointer.getRegionWidth()/2, target.getY() + target.getTextureRegion().getRegionHeight());
+		sb.end();
+		
+		if(activeAction != null) {
+			if(turnQueue.first() instanceof Warrior 
+					|| turnQueue.first() instanceof Mage 
+					|| turnQueue.first() instanceof Rogue) {
+				activeAction.render(sb, target);
+			}else {
+				activeAction.render(sb, enemyTarget);
+			}
+		}
 		
 		sb.begin();
 			fpsfont.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 730, 470);
@@ -444,6 +471,25 @@ public class Battle extends GameState {
 		fpsfont.dispose();
 		mainfont.dispose();
 		resetCharacters();
+	}
+	
+	private void initEnemies() {
+		if(enemies.size == 1) { 
+			enemies.get(0).setX(enemies.get(0).getBattleposition().x);
+			enemies.get(0).setY(enemies.get(0).getBattleposition().y);
+		} 
+		else if (enemies.size == 2) { 
+			for(int i=0; i < enemies.size; i++) {
+				enemies.get(i).setX(enemies.get(i).getBattleposition().x);
+				enemies.get(i).setY(enemies.get(i).getBattleposition().y);
+			}
+		} 
+		else if (enemies.size == 3){ 
+			for(int i=0; i < enemies.size; i++) {
+				enemies.get(i).setX(enemies.get(i).getBattleposition().x);
+				enemies.get(i).setY(enemies.get(i).getBattleposition().y);
+			}
+		}	
 	}
 	
 	private void initButtons() {
@@ -653,7 +699,7 @@ public class Battle extends GameState {
 		int k=0;
 		for(int i=0; i<playerCharacters.size; i++) {
 			barBgs.add(new Sprite(atlas.findRegion(HEALTHBARBG_IMG)));
-			barBgs.get(k).setPosition(mainbuttonbg.getWidth() * 0.80f, 
+			barBgs.get(k).setPosition(mainbuttonbg.getWidth() * 0.82f, 
 					mainbuttonbg.getHeight() * (0.90f - i * 0.25f) - barBgs.get(k).getHeight());
 			
 			healthBarfills.add(new Sprite(atlas.findRegion(HEALTHBARFILL_IMG)));
@@ -663,7 +709,7 @@ public class Battle extends GameState {
 			k++;
 			
 			barBgs.add(new Sprite(atlas.findRegion(HEALTHBARBG_IMG)));
-			barBgs.get(k).setPosition(mainbuttonbg.getWidth() * 0.80f, 
+			barBgs.get(k).setPosition(mainbuttonbg.getWidth() * 0.82f, 
 					barBgs.get(k-1).getY() - barBgs.get(k).getHeight());
 			
 			manaBarfills.add(new Sprite(atlas.findRegion(MANABARFILL_IMG)));
@@ -738,9 +784,10 @@ public class Battle extends GameState {
 		if(Gdx.input.justTouched()) {
 			for(Character e : enemies) {
 				if(Gdx.input.getX() > e.getX() 
-					&& Gdx.input.getX() < e.getX() + e.getTexture().getWidth() 
+					&& Gdx.input.getX() < e.getX() + e.getTextureRegion().getRegionWidth() 
 					&& Game.HEIGHT - Gdx.input.getY() > e.getY() 
-					&& Game.HEIGHT - Gdx.input.getY() < e.getY() + e.getTexture().getHeight()) {
+					&& Game.HEIGHT - Gdx.input.getY() < e.getY() + e.getTextureRegion().getRegionHeight()
+					&& e.isAlive()) {
 						target = e;
 						System.out.println("Target set: "+ e.getClass().getSimpleName());
 				}
@@ -752,8 +799,9 @@ public class Battle extends GameState {
 		playerCharacters.get(MAGE).setXY(oldMagePosition.x, oldMagePosition.y);
 		playerCharacters.get(WARRIOR).setXY(oldWarriorPosition.x, oldWarriorPosition.y);
 		playerCharacters.get(ROGUE).setXY(oldRoguePosition.x, oldRoguePosition.y);
-		playerCharacters.get(MAGE).setAttackCharge(0);
-		playerCharacters.get(WARRIOR).setAttackCharge(0);
-		playerCharacters.get(ROGUE).setAttackCharge(0);
+		for(Character c : playerCharacters) {
+			c.setAttackCharge(0);
+			c.setAttacking(false);
+		}
 	}
 }

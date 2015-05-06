@@ -108,23 +108,30 @@ subButtonBottom
   orig: 150, 50
   offset: 0, 0
   index: -1
-healthbarbg
+pointer
   rotate: false
   xy: 2, 872
+  size: 32, 30
+  orig: 32, 30
+  offset: 0, 0
+  index: -1
+healthbarbg
+  rotate: false
+  xy: 36, 872
   size: 64, 10
   orig: 64, 10
   offset: 0, 0
   index: -1
 manabarfill
   rotate: false
-  xy: 68, 872
+  xy: 36, 884
   size: 62, 8
   orig: 62, 8
   offset: 0, 0
   index: -1
 healthbarfill
   rotate: false
-  xy: 2, 884
+  xy: 36, 894
   size: 62, 8
   orig: 62, 8
   offset: 0, 0

@@ -1,0 +1,47 @@
+
+menu1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+background
+  rotate: false
+  xy: 2, 2
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+bigbox
+  rotate: false
+  xy: 2, 484
+  size: 550, 400
+  orig: 550, 400
+  offset: 0, 0
+  index: -1
+smallbox
+  rotate: false
+  xy: 804, 2
+  size: 160, 130
+  orig: 160, 130
+  offset: 0, 0
+  index: -1
+sideButtonNotClickable
+  rotate: false
+  xy: 804, 134
+  size: 160, 65
+  orig: 160, 65
+  offset: 0, 0
+  index: -1
+sideButtonClicked
+  rotate: false
+  xy: 804, 201
+  size: 160, 65
+  orig: 160, 65
+  offset: 0, 0
+  index: -1
+sideButton
+  rotate: false
+  xy: 804, 268
+  size: 160, 65
+  orig: 160, 65
+  offset: 0, 0
+  index: -1

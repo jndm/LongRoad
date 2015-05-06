@@ -52,7 +52,7 @@ public class GameStateManager {
 		gameStates.push(new Battle(this, array, chars, items)); 
 	}
 	
-	public void pushMainMenuState(int state, Array<Character> array, Array<Character> chars, Array<Item> items) {
+	public void pushMainMenuState(int state, Array<Character> chars, Array<Item> items) {
 		gameStates.push(new Mainmenu(this, chars, items)); 
 	}
 	

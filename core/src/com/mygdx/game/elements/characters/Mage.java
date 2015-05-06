@@ -15,43 +15,7 @@ public class Mage extends Character {
 			int strength, int agility, int intelligence) {
 		super(name, x, y, maxHp, maxMana, attackspeed, strength, agility, intelligence);
 		attackAbilities = new Array<Skill>();
-		attackAbilities.add(new DefaultAttack());
-		attackAbilities.add(new SpecialAttack());
-		
 		spells = new Array<Skill>();
-		spells.add(new DefaultSpell());
-		spells.add(new SpecialSpell());
-	}
-	
-	public void attack(Character target) {
-		
-	}
-
-	public void cast() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addEquipment(Equipment equipment) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public void addUnlockAttackSkill(Skill ability) {
-		attackAbilities.add(ability);
-	}
-
-	public Array<Skill> getAttackAbilities() {
-		return attackAbilities;
-	}
-	
-	public void addUnlockCastSkill(Skill ability) {
-		spells.add(ability);
-	}
-
-	public Array<Skill> getSpells() {
-		return spells;
 	}
 	
 }
