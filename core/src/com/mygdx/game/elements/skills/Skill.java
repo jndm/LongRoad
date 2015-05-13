@@ -14,6 +14,7 @@ public abstract class Skill {
 	protected Animation animation;
 	private BitmapFont font = new BitmapFont();
 	private float fontx, fonty;
+	protected float manareq;
 	
 	public abstract void act(Character actor, Character target);
 	
@@ -35,5 +36,13 @@ public abstract class Skill {
 	
 	public void createAnimation(TextureRegion[] tr) {
 		animation = new Animation(1/3f, tr);
+	}
+	
+	public boolean haveMana(Character c) {
+		if(c.getMana() >= manareq) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

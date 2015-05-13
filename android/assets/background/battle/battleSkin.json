@@ -1,0 +1,18 @@
+{
+	"com.badlogic.gdx.graphics.g2d.BitmapFont": {
+		"mainbuttonfont": 	{ "file": "fonts/battle/mainButton.fnt" },
+		"subbuttonfont": 	{ "file": "fonts/battle/subButton.fnt" }
+	},
+	
+	"com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+		"maintext":    	{ "font": mainbuttonfont },
+		"subtext":   	{ "font": subbuttonfont  }
+	},
+	
+	"com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+		"mainbutton": 	{ "up": "mainbutton.up",   "down": "mainbutton.down", 	"disabled": "mainbutton.disabled", 	 "checked": "mainbutton.down", 	 "font": mainbuttonfont },
+		"subbuttontop": { "up": "subbuttontop.up", "down": "subbuttontop.down", "disabled": "subbuttontop.disabled", "checked": "subbuttontop.down", "font": subbuttonfont },
+		"subbuttonmid": { "up": "subbuttonmid.up", "down": "subbuttonmid.down", "disabled": "subbuttonmid.disabled", "checked": "subbuttonmid.down", "font": subbuttonfont },
+		"subbuttonbot": { "up": "subbuttonbot.up", "down": "subbuttonbot.down", "disabled": "subbuttonbot.disabled", "checked": "subbuttonbot.down", "font": subbuttonfont }
+	}
+}

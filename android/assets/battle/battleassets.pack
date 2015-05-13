@@ -1,0 +1,149 @@
+
+battleassets.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+background
+  rotate: false
+  xy: 0, 450
+  size: 800, 280
+  split: 1, 0, 0, 0
+  orig: 800, 280
+  offset: 0, 0
+  index: -1
+buttonbg
+  rotate: false
+  xy: 0, 250
+  size: 800, 200
+  split: 0, 0, 0, 1
+  orig: 800, 200
+  offset: 0, 0
+  index: -1
+mainbutton.disabled
+  rotate: false
+  xy: 0, 200
+  size: 403, 50
+  split: 0, 0, 0, 1
+  orig: 403, 50
+  offset: 0, 0
+  index: -1
+mainbutton.down
+  rotate: false
+  xy: 0, 150
+  size: 403, 50
+  split: 1, 0, 0, 0
+  orig: 403, 50
+  offset: 0, 0
+  index: -1
+mainbutton.up
+  rotate: false
+  xy: 0, 100
+  size: 403, 50
+  split: 1, 0, 0, 1
+  orig: 403, 50
+  offset: 0, 0
+  index: -1
+subbuttonbot.disabled
+  rotate: false
+  xy: 800, 680
+  size: 150, 50
+  split: 0, 0, 0, 0
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subbuttonbot.down
+  rotate: false
+  xy: 403, 200
+  size: 150, 50
+  split: 0, 0, 0, 1
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subbuttonbot.up
+  rotate: false
+  xy: 0, 50
+  size: 150, 50
+  split: 0, 0, 0, 0
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subbuttonmid.disabled
+  rotate: false
+  xy: 800, 630
+  size: 150, 50
+  split: 0, 0, 0, 0
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subbuttonmid.down
+  rotate: false
+  xy: 403, 150
+  size: 150, 50
+  split: 0, 0, 0, 0
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subbuttonmid.up
+  rotate: false
+  xy: 553, 200
+  size: 150, 50
+  split: 0, 0, 0, 0
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subbuttontop.disabled
+  rotate: false
+  xy: 0, 0
+  size: 150, 50
+  split: 0, 0, 0, 0
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subbuttontop.down
+  rotate: false
+  xy: 150, 50
+  size: 150, 50
+  split: 0, 0, 0, 0
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+subbuttontop.up
+  rotate: false
+  xy: 800, 580
+  size: 150, 50
+  split: 0, 0, 0, 0
+  orig: 150, 50
+  offset: 0, 0
+  index: -1
+healthbarbg
+  rotate: false
+  xy: 950, 720
+  size: 64, 10
+  split: 0, 0, 0, 0
+  orig: 64, 10
+  offset: 0, 0
+  index: -1
+healthbarfill
+  rotate: false
+  xy: 403, 142
+  size: 62, 8
+  split: 0, 0, 0, 0
+  orig: 62, 8
+  offset: 0, 0
+  index: -1
+manabarfill
+  rotate: false
+  xy: 553, 192
+  size: 62, 8
+  split: 0, 0, 0, 0
+  orig: 62, 8
+  offset: 0, 0
+  index: -1
+pointer
+  rotate: false
+  xy: 703, 220
+  size: 32, 30
+  split: 0, 0, 0, 0
+  orig: 32, 30
+  offset: 0, 0
+  index: -1

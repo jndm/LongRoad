@@ -175,7 +175,7 @@ public abstract class Character {
 	public void setAttackCharge(float attackCharge) { this.attackCharge = attackCharge; }
 
 	public float getMana() { return mana; }
-	public void setMana(int mana) { this.mana = mana; }
+	public void setMana(float mana) { this.mana = mana; }
 
 	public float getMaxHp() { return maxHp; }
 	public void setMaxHp(float maxHp) { this.maxHp = maxHp; }

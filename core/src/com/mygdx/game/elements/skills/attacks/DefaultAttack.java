@@ -5,6 +5,11 @@ import com.mygdx.game.elements.skills.Skill;
 import com.mygdx.game.elements.characters.Character;
 
 public class DefaultAttack extends Skill{
+	
+	public DefaultAttack() {
+		super();
+		manareq = 0;
+	}
 
 	@Override
 	public void act(Character actor, Character target) {

@@ -5,9 +5,15 @@ import com.mygdx.game.elements.skills.Skill;
 import com.mygdx.game.elements.characters.Character;
 
 public class SpecialAttack extends Skill{
+	
+	public SpecialAttack() {
+		super();
+		manareq = 100;
+	}
 
 	@Override
 	public void act(Character actor, Character target) {
+		actor.setMana(actor.getMana() - manareq);
 		this.dmg = actor.getStrength() * 2;
 		float targetHp = target.getHp() - this.dmg;
 		target.setHp(targetHp);

@@ -494,13 +494,13 @@ public class Battle extends GameState {
 	
 	private void initButtons() {
 		//Creating fonts for buttons
-		Texture fonttexture = new Texture(Gdx.files.internal("fonts/mainButton.png"));
+		Texture fonttexture = new Texture(Gdx.files.internal("fonts/battle/mainButton.png"));
 		fonttexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		BitmapFont mainfont = new BitmapFont(Gdx.files.internal("fonts/mainButton.fnt"), new TextureRegion(fonttexture), false);
+		BitmapFont mainfont = new BitmapFont(Gdx.files.internal("fonts/battle/mainButton.fnt"), new TextureRegion(fonttexture), false);
 		
-		fonttexture = new Texture(Gdx.files.internal("fonts/subButton.png"));
+		fonttexture = new Texture(Gdx.files.internal("fonts/battle/subButton.png"));
 		fonttexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		BitmapFont subfont = new BitmapFont(Gdx.files.internal("fonts/subButton.fnt"), new TextureRegion(fonttexture), false);
+		BitmapFont subfont = new BitmapFont(Gdx.files.internal("fonts/battle/subButton.fnt"), new TextureRegion(fonttexture), false);
 		
 		mainButtons = new Array<Button>();
 		subAttackButtons = new Array<Button>();

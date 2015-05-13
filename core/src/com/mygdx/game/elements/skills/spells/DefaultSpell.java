@@ -6,6 +6,11 @@ import com.mygdx.game.elements.characters.Character;
 
 public class DefaultSpell extends Skill{
 
+	public DefaultSpell() {
+		super();
+		manareq = 0;
+	}
+	
 	@Override
 	public void act(Character actor, Character target) {
 		System.out.print("Doing defaultspell!");
