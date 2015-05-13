@@ -46,12 +46,16 @@ public class Game implements ApplicationListener {
 		assetManager.dispose();
 	}
 	
+	public void resize(int w, int h) {
+		gsm.resize(w, h);
+	}
+	
 	public SpriteBatch getSpriteBatch() { return sb; }
 	public OrthographicCamera getCamera() { return cam; }
 	public OrthographicCamera getHUDCamera() { return hudCam; }
 	public AssetManager getAssetManger() { return assetManager; }
 	
-	public void resize(int w, int h) {}
+	
 	public void pause() {}
 	public void resume() {}
 	

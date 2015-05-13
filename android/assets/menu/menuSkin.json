@@ -1,0 +1,21 @@
+{
+	"com.badlogic.gdx.graphics.g2d.BitmapFont": {
+		"sidebuttonfont": 	{ "file": "fonts/menu/sidebuttonfont.fnt" },
+		"smallboxfont": 	{ "file": "fonts/menu/smallboxfont.fnt" },
+		"inventoryboxfont": { "file": "fonts/menu/inventoryboxfont.fnt" }
+	},
+	
+	"com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+		"smallboxtext":    		{ "font": smallboxfont },
+		"statusboxtext":   		{ "font": smallboxfont },
+		"statusboxheader": 		{ "font": sidebuttonfont },
+		"inventoryboxtext":		{ "font": inventoryboxfont }
+	},
+	
+	"com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+		"sidebutton": { "up": "sideButton.up", "down": "sidebutton.down", "disabled": "sidebutton.disabled", "checked": "sidebutton.down", "font": sidebuttonfont },
+		"inventorytabbutton": { "up": "sideButton.up", "down": "sidebutton.down", "disabled": "sidebutton.disabled", "checked": "sidebutton.down", "font": sidebuttonfont },
+		"itembutton": { "up": "sideButton.up", "down": "sidebutton.down", "disabled": "sidebutton.disabled", "checked": "sidebutton.down", "font": sidebuttonfont },
+		"itemsmallbutton": { "up": "sideButton.up", "down": "sidebutton.down", "disabled": "sidebutton.disabled", "checked": "sidebutton.down", "font": smallboxfont }
+	}
+}

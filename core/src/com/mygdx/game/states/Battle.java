@@ -804,4 +804,10 @@ public class Battle extends GameState {
 			c.setAttacking(false);
 		}
 	}
+
+	@Override
+	public void resize(int w, int h) {
+		// TODO Auto-generated method stub
+		
+	}
 }

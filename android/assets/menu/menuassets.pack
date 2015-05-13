@@ -1,47 +1,74 @@
 
-menu1.png
+menuassets.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 background
   rotate: false
-  xy: 2, 2
+  xy: 0, 465
   size: 800, 480
+  split: 0, 0, 0, 0
   orig: 800, 480
   offset: 0, 0
   index: -1
 bigbox
   rotate: false
-  xy: 2, 484
+  xy: 0, 65
   size: 550, 400
+  split: 0, 0, 0, 0
   orig: 550, 400
   offset: 0, 0
   index: -1
 smallbox
   rotate: false
-  xy: 804, 2
+  xy: 800, 815
   size: 160, 130
+  split: 0, 0, 0, 0
   orig: 160, 130
   offset: 0, 0
   index: -1
-sideButtonNotClickable
+sidebutton.disabled
   rotate: false
-  xy: 804, 134
+  xy: 0, 0
   size: 160, 65
+  split: 0, 0, 0, 0
   orig: 160, 65
   offset: 0, 0
   index: -1
-sideButtonClicked
+sidebutton.down
   rotate: false
-  xy: 804, 201
+  xy: 550, 400
   size: 160, 65
+  split: 0, 0, 0, 0
   orig: 160, 65
   offset: 0, 0
   index: -1
-sideButton
+sideButton.up
   rotate: false
-  xy: 804, 268
+  xy: 800, 750
   size: 160, 65
+  split: 0, 0, 0, 0
   orig: 160, 65
+  offset: 0, 0
+  index: -1
+exitbutton
+  rotate: false
+  xy: 960, 913
+  size: 32, 32
+  split: 0, 0, 0, 0
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+
+menuassets2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+statusbg
+  rotate: false
+  xy: 0, 0
+  size: 550, 183
+  split: 0, 0, 0, 0
+  orig: 550, 183
   offset: 0, 0
   index: -1

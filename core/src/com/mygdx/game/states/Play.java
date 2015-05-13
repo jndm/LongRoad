@@ -1,6 +1,7 @@
 package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -39,7 +40,7 @@ public class Play extends GameState {
 	private final int ROGUE = 2;
 	private Array<Character> playerCharacters;
 	private Array<Array<Character>> enemywaves;
-	private Array<Item> items;
+	public static Array<Item> items;
 	
 	private long startTime = 0;
 	
@@ -231,9 +232,14 @@ public class Play extends GameState {
 		}	
 	}
 
-	public void handleInput() {}
+	public void handleInput() {
+		if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			gsm.pushMainMenuState(GameStateManager.MENU, playerCharacters, items);
+		}
+	}
 	
 	public void update(float dt) {
+		handleInput();
 		for(Character c : playerCharacters){
 			c.move(dt);
 		}	
@@ -298,5 +304,11 @@ public class Play extends GameState {
 		assets.unload(MAGE_IMG);
 		assets.unload(ROGUE_IMG);
 		assets.unload(SKELETON_IMG);
+	}
+
+	@Override
+	public void resize(int w, int h) {
+		// TODO Auto-generated method stub
+		
 	}	
 }

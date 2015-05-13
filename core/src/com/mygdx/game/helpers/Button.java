@@ -1,12 +1,12 @@
 package com.mygdx.game.helpers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.items.Item;
 import com.mygdx.game.elements.skills.Skill;
-import com.mygdx.game.helpers.MainmenuButtonActions.SideButtonAction;
 
 public class Button {
 	private int x;
@@ -15,7 +15,6 @@ public class Button {
 	private int height;
 	private ButtonAction action;
 	private Skill action2;
-	private SideButtonAction sideButtonAction;
 	private Item item;
 	private TextureRegion[] texture = new TextureRegion[3];
 	private boolean clicked = false;
@@ -59,17 +58,6 @@ public class Button {
 		this.text = text;
 		this.font = font;
 	}
-	
-	//Constructor for mainmenu sidebuttons
-	public Button(int x, int y, int width, int height, String text, SideButtonAction action, BitmapFont font) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.sideButtonAction = action;
-		this.text = text;
-		this.font = font;
-	}
 
 	public void render(SpriteBatch sb) {
 		sb.begin();
@@ -87,7 +75,7 @@ public class Button {
 	}
 	
 	public boolean isMouseOnButton(int mx, int my) {
-		int myInverted = Game.HEIGHT - my - 1;
+		int myInverted = Gdx.graphics.getHeight() - my - 1;
 		if(mx < x || mx > x + width || 
 				myInverted < y || myInverted > y + height) {
 			clicked = false;
@@ -210,13 +198,5 @@ public class Button {
 		this.item = item;
 	}
 
-	public SideButtonAction getSideButtonAction() {
-		return sideButtonAction;
-	}
-
-	public void setSideButtonAction(SideButtonAction sideButtonAction) {
-		this.sideButtonAction = sideButtonAction;
-	}
-	
 	
 }
