@@ -261,7 +261,7 @@ public class Play extends GameState {
 	}
 	
 	public void render() {
-		
+		viewport.apply();
 		cam.position.x = playerCharacters.get(WARRIOR).getX() + Game.WIDTH / 3;
 		cam.update();	
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);		
@@ -292,6 +292,7 @@ public class Play extends GameState {
 		
 		//HUD
 		sb.setProjectionMatrix(hudCam.combined);
+		viewport2.apply();
 		sb.begin();
 			font.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 730, 470);
 		sb.end();
@@ -308,7 +309,7 @@ public class Play extends GameState {
 
 	@Override
 	public void resize(int w, int h) {
-		// TODO Auto-generated method stub
-		
+		viewport.update(w, h, true);
+		viewport2.update(w, h, false);
 	}	
 }

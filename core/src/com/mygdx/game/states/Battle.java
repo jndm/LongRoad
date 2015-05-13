@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.characters.Character;
@@ -807,6 +810,11 @@ public class Battle extends GameState {
 
 	@Override
 	public void resize(int w, int h) {
+		viewport.update(w, h, true);
+		viewport2.update(w, h, true);
+	}
+
+	public void hideExtraTables() {
 		// TODO Auto-generated method stub
 		
 	}

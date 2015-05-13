@@ -47,7 +47,7 @@ public class NewBattle extends GameState {
 	private Vector2 oldMagePosition, oldWarriorPosition, oldRoguePosition;
 	
 	//Needed for playing action
-	private final float ACTIONMOVEMAX = Gdx.graphics.getWidth() * 0.375f;
+	private final float ACTIONMOVEMAX = Game.WIDTH * 0.375f;
 	private boolean steppedForvard = false;
 	private boolean actionFinished = false;
 	private int deadPlayerCharacters = 0;
@@ -93,7 +93,7 @@ public class NewBattle extends GameState {
 		//Setup bottom table
 		stage = new Stage();
 		skin = new Skin(Gdx.files.internal("battle/battleSkin.json"), atlas);
-		
+
 		mastertable = new Table(skin);
 		mastertable.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * 0.42f);
 		mastertable.setPosition(0, 0);
@@ -102,6 +102,10 @@ public class NewBattle extends GameState {
 		initCastTables();
 		initMainTable();
 		initSideTable();
+		
+		for(Character c : chars) {
+			checkManaLeftAndDisableButtons(c);
+		}
 		
 		mastertable.add(mainButtonTable).left();
 		mastertable.add().fill().expand();
@@ -116,7 +120,8 @@ public class NewBattle extends GameState {
 		target = this.enemies.first();
 		turnQueue = new Array<Character>();
 		bg = new Sprite(atlas.findRegion("background"));
-		bg.setPosition(0, mastertable.getHeight());
+		bg.setSize(Game.WIDTH, Game.HEIGHT * 0.58f);
+		bg.setPosition(0, Game.HEIGHT * 0.42f);
 		pointer = new Sprite(atlas.findRegion("pointer"));
 		pointer.setPosition(target.getX() + target.getTextureRegion().getRegionWidth()/2 - pointer.getWidth()/2, 
 				target.getY() + target.getTextureRegion().getRegionHeight());
@@ -142,49 +147,23 @@ public class NewBattle extends GameState {
 			bg.setMinCheckCount(0);
 			int i = 0;
 			for(final Skill s : c.getAttackAbilities()) { //Start of inner for
+				TextButton tb = null;
 				if( i == 0 && c.getAttackAbilities().size > 1) {
-					final TextButton tb = new SkillTextButton(s.toString(), skin, "subbuttontop", s);
-					tb.addListener(new ClickListener() {
-						@Override
-						public void clicked(InputEvent event, float x, float y) {
-							activeAction = s;
-							hideExtraTables();
-							setCharactersButtonsUnchecked(c);
-						}
-					});
-					bg.add(tb);
-					table.add(tb);
-				} else if( i == c.getAttackAbilities().size-1 && c.getAttackAbilities().size > 1) {
-					final TextButton tb = new SkillTextButton(s.toString(), skin, "subbuttonbot", s);
-					tb.addListener(new ClickListener() {
-						@Override
-						public void clicked(InputEvent event, float x, float y) {
-							activeAction = s;
-							hideExtraTables();
-							setCharactersButtonsUnchecked(c);
-						}
-					});
-					bg.add(tb);
-					table.add(tb);
+					tb = new SkillTextButton(s.toString(), skin, "subbuttontop", s);				
+				} else if( i == c.getAttackAbilities().size-1 && c.getSpells().size > 1) {
+					tb = new SkillTextButton(s.toString(), skin, "subbuttonbot", s);
 				} else {
-					final TextButton tb = new SkillTextButton(s.toString(), skin, "subbuttonmid", s);
-					tb.addListener(new ClickListener() {
-						@Override
-						public void clicked(InputEvent event, float x, float y) {
-							activeAction = s;
-							hideExtraTables();
-							setCharactersButtonsUnchecked(c);
-						}
-					});
-					bg.add(tb);
-					table.add(tb);
-				} //end of inner for
+					tb = new SkillTextButton(s.toString(), skin, "subbuttonmid", s);			
+				} 
+				tb.addListener(new SkillClickListener(tb, s, c));
+				bg.add(tb);
+				table.add(tb);
 				table.row();
 				i++;
-			} //end of for
+			} //end of inner for
 			attackbuttongroup.add(bg);
 			attackTables.add(table);
-		}
+		}// end of for
 	}
 
 	private void initCastTables() {
@@ -197,49 +176,23 @@ public class NewBattle extends GameState {
 			bg.setMinCheckCount(0);
 			int i = 0;
 			for(final Skill s : c.getSpells()) { //Start of inner for
+				TextButton tb = null;
 				if( i == 0 && c.getSpells().size > 1) {
-					final TextButton tb = new SkillTextButton(s.toString(), skin, "subbuttontop", s);
-					tb.addListener(new ClickListener() {
-						@Override
-						public void clicked(InputEvent event, float x, float y) {
-							activeAction = s;
-							hideExtraTables();
-							setCharactersButtonsUnchecked(c);
-						}
-					});
-					bg.add(tb);
-					table.add(tb);
+					tb = new SkillTextButton(s.toString(), skin, "subbuttontop", s);				
 				} else if( i == c.getSpells().size-1 && c.getSpells().size > 1) {
-					final TextButton tb = new SkillTextButton(s.toString(), skin, "subbuttonbot", s);
-					tb.addListener(new ClickListener() {
-						@Override
-						public void clicked(InputEvent event, float x, float y) {
-							activeAction = s;
-							hideExtraTables();
-							setCharactersButtonsUnchecked(c);
-						}
-					});
-					bg.add(tb);
-					table.add(tb);
+					tb = new SkillTextButton(s.toString(), skin, "subbuttonbot", s);
 				} else {
-					final TextButton tb = new SkillTextButton(s.toString(), skin, "subbuttonmid", s);
-					tb.addListener(new ClickListener() {
-						@Override
-						public void clicked(InputEvent event, float x, float y) {
-							activeAction = s;
-							hideExtraTables();
-							setCharactersButtonsUnchecked(c);
-						}
-					});
-					bg.add(tb);
-					table.add(tb);
-				} //end of inner for
+					tb = new SkillTextButton(s.toString(), skin, "subbuttonmid", s);			
+				} 
+				tb.addListener(new SkillClickListener(tb, s, c));
+				bg.add(tb);
+				table.add(tb);
 				table.row();
 				i++;
-			} // end of for
+			} //end of inner for
 			castbuttongroup.add(bg);
 			castTables.add(table);
-		}
+		}// end of for
 	}
 
 	protected void hideExtraTables() {
@@ -365,6 +318,11 @@ public class NewBattle extends GameState {
 	
 	@Override
 	public void update(float dt) {
+		
+		for(Character c : chars) {
+			checkManaLeftAndDisableButtons(c);
+		}
+		
 		if(activeAction == null) { //If there is no action to be shown:
 			if(turnQueue.size == 0) {	// If no-one has turn, charge it
 				setMainButtonsDisabled(true);
@@ -470,11 +428,31 @@ public class NewBattle extends GameState {
 			if(turnQueue.first().getX() > turnQueue.first().getBattleposition().x) {
 				turnQueue.first().moveBackward(dt);
 			} else {
-				resetAction();				
+				resetAction();
 				if(deadEnemies == enemies.size) {	//If all enemies are dead win battle
 					System.out.println("WINNER!");
 					gsm.popState();
 				}
+			}
+		}
+	}
+
+	private void checkManaLeftAndDisableButtons(Character c) {
+		int index = 10;
+		if(c instanceof Warrior) {
+			index = WARRIOR;
+		} else if(c instanceof Rogue) {
+			index = ROGUE;
+		} else if(c instanceof Mage) {
+			index = MAGE;
+		}
+		if(index != 10) {
+			for(TextButton b : attackbuttongroup.get(index).getButtons()) {
+				((SkillTextButton) b).setDisabledIfNotEnoughMana(c);
+			}
+			
+			for(TextButton b : castbuttongroup.get(index).getButtons()) {
+				((SkillTextButton) b).setDisabledIfNotEnoughMana(c);
 			}
 		}
 	}
@@ -556,9 +534,9 @@ public class NewBattle extends GameState {
 	public void render() {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		sb.setProjectionMatrix(hudCam.combined);
+		
+		viewport2.apply();
 		
 		sb.begin();
 			bg.draw(sb);
@@ -583,12 +561,12 @@ public class NewBattle extends GameState {
 				activeAction.render(sb, enemyTarget);
 			}
 		}
-		
 		sb.begin();
 			fpsfont.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 730, 470);
 		sb.end();
 		
 		sb.setProjectionMatrix(stage.getCamera().combined);
+		stage.getViewport().apply();
 		stage.act();
 		stage.draw();
 	}
@@ -625,6 +603,7 @@ public class NewBattle extends GameState {
 	@Override
 	public void resize(int w, int h) {
 		stage.getViewport().update(w, h, true);
+		viewport2.update(w, h, false);
 	}
 
 	@Override
@@ -642,6 +621,30 @@ public class NewBattle extends GameState {
 		for(Character c : chars) {
 			c.setAttackCharge(0);
 			c.setAttacking(false);
+		}
+	}
+	
+	public class SkillClickListener extends ClickListener {
+		
+		private TextButton tb;
+		private Skill s;
+		private Character c;
+		
+		public SkillClickListener(TextButton tb, Skill s, Character c) {
+			this.tb = tb;
+			this.s = s;
+			this.c = c;
+		}
+		
+		@Override
+		public void clicked(InputEvent event, float x, float y) {
+			System.out.println("ASDASDA");
+			if(!tb.isDisabled()) {
+				activeAction = s;
+				hideExtraTables();
+				setCharactersButtonsUnchecked(c);
+				System.out.println("ASDASDA");
+			}
 		}
 	}
 
