@@ -2,12 +2,7 @@ package com.mygdx.game.elements.characters;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.elements.ai.Ai;
-import com.mygdx.game.elements.items.Equipment;
 import com.mygdx.game.elements.skills.Skill;
-import com.mygdx.game.elements.skills.attacks.DefaultAttack;
-import com.mygdx.game.elements.skills.attacks.SpecialAttack;
-import com.mygdx.game.elements.skills.spells.DefaultSpell;
-import com.mygdx.game.elements.skills.spells.SpecialSpell;
 
 public class Skeleton extends Character {
 	

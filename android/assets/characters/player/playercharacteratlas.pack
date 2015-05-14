@@ -1,0 +1,194 @@
+
+player1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+warrior.moving1
+  rotate: false
+  xy: 2, 2
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+warrior.moving0
+  rotate: false
+  xy: 68, 2
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+rogue.moving1
+  rotate: false
+  xy: 134, 2
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+rogue.moving0
+  rotate: false
+  xy: 2, 132
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+mage.moving1
+  rotate: false
+  xy: 68, 132
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+mage.moving0
+  rotate: false
+  xy: 134, 132
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+mage.attack1
+  rotate: false
+  xy: 2, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+mage.attack4
+  rotate: false
+  xy: 2, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+rogue.attack1
+  rotate: false
+  xy: 2, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+rogue.attack5
+  rotate: false
+  xy: 2, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+warrior.attack2
+  rotate: false
+  xy: 2, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+warrior.attack5
+  rotate: false
+  xy: 2, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+warrior
+  rotate: false
+  xy: 2, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+mage.attack0
+  rotate: false
+  xy: 68, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+mage.attack3
+  rotate: false
+  xy: 68, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+rogue.attack2
+  rotate: false
+  xy: 68, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+rogue.attack4
+  rotate: false
+  xy: 68, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+rogue
+  rotate: false
+  xy: 68, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+warrior.attack1
+  rotate: false
+  xy: 68, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+warrior.attack4
+  rotate: false
+  xy: 68, 262
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+mage.attack2
+  rotate: false
+  xy: 134, 262
+  size: 60, 120
+  orig: 60, 120
+  offset: 0, 0
+  index: -1
+mage.attack5
+  rotate: false
+  xy: 134, 262
+  size: 60, 120
+  orig: 60, 120
+  offset: 0, 0
+  index: -1
+mage
+  rotate: false
+  xy: 134, 262
+  size: 60, 120
+  orig: 60, 120
+  offset: 0, 0
+  index: -1
+rogue.attack0
+  rotate: false
+  xy: 134, 262
+  size: 60, 120
+  orig: 60, 120
+  offset: 0, 0
+  index: -1
+rogue.attack3
+  rotate: false
+  xy: 134, 262
+  size: 60, 120
+  orig: 60, 120
+  offset: 0, 0
+  index: -1
+warrior.attack0
+  rotate: false
+  xy: 134, 262
+  size: 60, 120
+  orig: 60, 120
+  offset: 0, 0
+  index: -1
+warrior.attack3
+  rotate: false
+  xy: 134, 262
+  size: 60, 120
+  orig: 60, 120
+  offset: 0, 0
+  index: -1

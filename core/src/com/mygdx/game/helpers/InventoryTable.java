@@ -1,7 +1,5 @@
 package com.mygdx.game.helpers;
 
-import java.util.Iterator;
-
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
@@ -12,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.elements.characters.Character;
+import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.elements.items.Potion;
 import com.mygdx.game.states.Menu;
 import com.mygdx.game.states.Play;
@@ -66,12 +65,12 @@ public class InventoryTable {
 	    toggle.setUncheckLast(true);
 	    
 	    //Create item buttons
-	    for(int i=0; i<Play.items.size; i++) {
+	    for(int i=0; i<Party.items.size; i++) {
 	    	if(i>1 && i%2==0) {
 	    		temp_table.row();
 	    	}
 	    	temp_table.add().width(50).height(50).top();	//Spot for icon 
-	    	final TextButton tmp = new TextButton(Play.items.get(i).toString()+" x"+Play.items.get(i).getCount(), menu.getSkin(), "itembutton"); //Button with item name
+	    	final TextButton tmp = new TextButton(Party.items.get(i).toString()+" x"+Party.items.get(i).getCount(), menu.getSkin(), "itembutton"); //Button with item name
 	    	//final TextButton tmp = new TextButton("asdasdasd", menu.getSkin(), "itembutton");
 	    	tmp.addListener(new ItemClickListener(new Potion(), menu, tmp, playerCharacters)); //Add custom listener to item button
 	    	toggle.add(tmp);

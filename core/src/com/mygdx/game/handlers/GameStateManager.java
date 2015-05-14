@@ -5,11 +5,11 @@ import java.util.Stack;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.characters.Character;
-import com.mygdx.game.elements.items.Item;
-import com.mygdx.game.states.OldBattle;
+import com.mygdx.game.elements.characters.Party;
+import com.mygdx.game.states.Battle;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.Menu;
-import com.mygdx.game.states.Battle;
+import com.mygdx.game.states.OldBattle;
 import com.mygdx.game.states.Play;
 
 public class GameStateManager {
@@ -49,12 +49,12 @@ public class GameStateManager {
 		pushState(state);
 	}
 	
-	public void pushBattleState(int state, Array<Character> array, Array<Character> chars, Array<Item> items) {
-		gameStates.push(new Battle(this, array, chars, items)); 
+	public void pushBattleState(int state, Array<Character> array, Party party) {
+		gameStates.push(new Battle(this, array, party)); 
 	}
 	
-	public void pushMainMenuState(int state, Array<Character> chars, Array<Item> items) {
-		gameStates.push(new Menu(this, chars, items)); 
+	public void pushMainMenuState(int state, Party party) {
+		gameStates.push(new Menu(this, party)); 
 	}
 	
 	public void pushState(int state) {

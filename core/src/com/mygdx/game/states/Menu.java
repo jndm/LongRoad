@@ -12,20 +12,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.elements.characters.Character;
-import com.mygdx.game.elements.items.Item;
-import com.mygdx.game.elements.items.Potion;
+import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.handlers.GameStateManager;
 import com.mygdx.game.helpers.InventoryTable;
-import com.mygdx.game.helpers.ItemClickListener;
 
 public class Menu extends GameState {
 
@@ -45,9 +40,9 @@ public class Menu extends GameState {
 		super(gsm);
 	}
 	
-	public Menu(final GameStateManager gsm, Array<Character> chars, Array<Item> items) {
+	public Menu(final GameStateManager gsm, Party party) {
 		super(gsm);	
-		playerCharacters = chars;
+		playerCharacters = party.getCharacters();
 		assets.load(MENUATLAS, TextureAtlas.class);
 		assets.finishLoading();
 		

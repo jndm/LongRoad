@@ -114,24 +114,12 @@ public abstract class Character {
 		attackCharge += attackSpeed;
 	}
 	
-	//JUST FOR TESTING
-	public void createAttackAnimation(TextureRegion t1, TextureRegion t2, TextureRegion t3) {
-		TextureRegion[] tmp = new TextureRegion[10];
-		tmp[0] = t2;
-		tmp[1] = t2;
-		tmp[2] = t3;
-		tmp[3] = t1;
-		tmp[4] = t2;
-		tmp[5] = t3;
-		tmp[6] = t1;
-		tmp[7] = t2;
-		tmp[8] = t3;
-		tmp[9] = t1;
-		attackAnimation = new Animation(1/10f, tmp);
+	public void setAttackAnimation(Animation a) {
+		attackAnimation = a;
 	}
 	
-	public void createMovingAnimation(TextureRegion[] tr) {
-		moveAnimation = new Animation(1/10f, tr);
+	public void setMovingAnimation(Animation a) {
+		moveAnimation = a;
 	}
 	
 	public Skill raffleSkillToUse() {

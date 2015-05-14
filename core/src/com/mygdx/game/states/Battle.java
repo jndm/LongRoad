@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,19 +17,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.characters.Mage;
+import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.elements.characters.Rogue;
 import com.mygdx.game.elements.characters.Warrior;
 import com.mygdx.game.elements.items.Item;
 import com.mygdx.game.elements.skills.Skill;
-import com.mygdx.game.elements.skills.attacks.DefaultAttack;
 import com.mygdx.game.handlers.GameStateManager;
-import com.mygdx.game.helpers.Button;
 import com.mygdx.game.helpers.SkillTextButton;
 
 public class Battle extends GameState {
@@ -79,11 +76,10 @@ public class Battle extends GameState {
 		super(gsm);
 	}
 
-	public Battle(GameStateManager gsm, Array<Character> enemies, Array<Character> chars, Array<Item> items) {
+	public Battle(GameStateManager gsm, Array<Character> enemies, Party party) {
 		super(gsm);
 		this.enemies = enemies;
-		this.chars = chars;
-		this.items = items;
+		this.chars = party.getCharacters();
 		
 		assets.load(BATTLEATLAS, TextureAtlas.class);
 		assets.finishLoading();
