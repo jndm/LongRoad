@@ -6,10 +6,10 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.items.Item;
-import com.mygdx.game.states.Battle;
+import com.mygdx.game.states.OldBattle;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.Menu;
-import com.mygdx.game.states.NewBattle;
+import com.mygdx.game.states.Battle;
 import com.mygdx.game.states.Play;
 
 public class GameStateManager {
@@ -40,7 +40,7 @@ public class GameStateManager {
 	
 	private GameState getState(int state) {
 		if(state == PLAY) return new Play(this);
-		if(state == BATTLE) return new Battle(this);
+		if(state == BATTLE) return new OldBattle(this);
 		return null;
 	}
 	
@@ -50,7 +50,7 @@ public class GameStateManager {
 	}
 	
 	public void pushBattleState(int state, Array<Character> array, Array<Character> chars, Array<Item> items) {
-		gameStates.push(new NewBattle(this, array, chars, items)); 
+		gameStates.push(new Battle(this, array, chars, items)); 
 	}
 	
 	public void pushMainMenuState(int state, Array<Character> chars, Array<Item> items) {
