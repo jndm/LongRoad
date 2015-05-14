@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -34,7 +35,6 @@ import com.mygdx.game.helpers.SkillTextButton;
 
 public class NewBattle extends GameState {
 
-	private Sprite bg;
 	private Sprite pointer;
 	
 	private Array<Character> enemies;
@@ -95,20 +95,21 @@ public class NewBattle extends GameState {
 		skin = new Skin(Gdx.files.internal("battle/battleSkin.json"), atlas);
 
 		mastertable = new Table(skin);
-		mastertable.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * 0.42f);
+		mastertable.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		mastertable.setPosition(0, 0);
 		
-		initAttackTables();
-		initCastTables();
 		initMainTable();
 		initSideTable();
+		initAttackTables();
+		initCastTables();
 		
 		for(Character c : chars) {
 			checkManaLeftAndDisableButtons(c);
 		}
-		
+		mastertable.add(new Image(atlas.findRegion("background"))).colspan(2).fill().expand();
+		mastertable.row();
 		mastertable.add(mainButtonTable).left();
-		mastertable.add().fill().expand();
+		mastertable.add().fillX().expandX();
 		mastertable.debug();
 		stage.addActor(mastertable);
 		
@@ -119,9 +120,6 @@ public class NewBattle extends GameState {
 		initEnemies();
 		target = this.enemies.first();
 		turnQueue = new Array<Character>();
-		bg = new Sprite(atlas.findRegion("background"));
-		bg.setSize(Game.WIDTH, Game.HEIGHT * 0.58f);
-		bg.setPosition(0, Game.HEIGHT * 0.42f);
 		pointer = new Sprite(atlas.findRegion("pointer"));
 		pointer.setPosition(target.getX() + target.getTextureRegion().getRegionWidth()/2 - pointer.getWidth()/2, 
 				target.getY() + target.getTextureRegion().getRegionHeight());
@@ -132,188 +130,7 @@ public class NewBattle extends GameState {
 		
 		chars.get(MAGE).setXY(chars.get(MAGE).getBattleposition().x, chars.get(MAGE).getBattleposition().y);
 		chars.get(WARRIOR).setXY(chars.get(WARRIOR).getBattleposition().x, chars.get(WARRIOR).getBattleposition().y);
-		chars.get(ROGUE).setXY(chars.get(ROGUE).getBattleposition().x, chars.get(ROGUE).getBattleposition().y);
-		
-		
-	}
-
-	private void initAttackTables() {
-		attackTables = new Array<Table>();
-		attackbuttongroup = new Array<ButtonGroup<TextButton>>();
-		
-		for(final Character c : chars) {
-			Table table = new Table(skin);
-			ButtonGroup<TextButton> bg = new ButtonGroup<TextButton>();
-			bg.setMinCheckCount(0);
-			int i = 0;
-			for(final Skill s : c.getAttackAbilities()) { //Start of inner for
-				TextButton tb = null;
-				if( i == 0 && c.getAttackAbilities().size > 1) {
-					tb = new SkillTextButton(s.toString(), skin, "subbuttontop", s);				
-				} else if( i == c.getAttackAbilities().size-1 && c.getSpells().size > 1) {
-					tb = new SkillTextButton(s.toString(), skin, "subbuttonbot", s);
-				} else {
-					tb = new SkillTextButton(s.toString(), skin, "subbuttonmid", s);			
-				} 
-				tb.addListener(new SkillClickListener(tb, s, c));
-				bg.add(tb);
-				table.add(tb);
-				table.row();
-				i++;
-			} //end of inner for
-			attackbuttongroup.add(bg);
-			attackTables.add(table);
-		}// end of for
-	}
-
-	private void initCastTables() {
-		castTables = new Array<Table>();
-		castbuttongroup = new Array<ButtonGroup<TextButton>>();
-		
-		for(final Character c : chars) {
-			Table table = new Table(skin);
-			ButtonGroup<TextButton> bg = new ButtonGroup<TextButton>();
-			bg.setMinCheckCount(0);
-			int i = 0;
-			for(final Skill s : c.getSpells()) { //Start of inner for
-				TextButton tb = null;
-				if( i == 0 && c.getSpells().size > 1) {
-					tb = new SkillTextButton(s.toString(), skin, "subbuttontop", s);				
-				} else if( i == c.getSpells().size-1 && c.getSpells().size > 1) {
-					tb = new SkillTextButton(s.toString(), skin, "subbuttonbot", s);
-				} else {
-					tb = new SkillTextButton(s.toString(), skin, "subbuttonmid", s);			
-				} 
-				tb.addListener(new SkillClickListener(tb, s, c));
-				bg.add(tb);
-				table.add(tb);
-				table.row();
-				i++;
-			} //end of inner for
-			castbuttongroup.add(bg);
-			castTables.add(table);
-		}// end of for
-	}
-
-	protected void hideExtraTables() {
-		if(stage.getActors().size > 1) {
-			Iterator<Actor> i = stage.getActors().iterator();
-			i.next();
-			while (i.hasNext()) {
-			   Actor s = i.next();
-			   i.remove();
-			}
-		}
-		stage.getActors().shrink();
-}
-
-	private void initSideTable() {
-		
-	}
-
-	private void initMainTable() {
-		mainButtonTable = new Table(skin);
-		
-		//Creating attack button:
-		final TextButton attackb = new TextButton("Attack", skin, "mainbutton");
-		attackb.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				if(!attackb.isDisabled()) {		//check if disabled
-					if(attackb.isChecked()) {	//check if click made button checked
-						hideExtraTables();
-						if(turnQueue.first() instanceof Warrior) {
-							showAttackTable(attackTables.get(WARRIOR));
-						} else if(turnQueue.first() instanceof Rogue) {
-							showAttackTable(attackTables.get(ROGUE));
-						} else if(turnQueue.first() instanceof Mage) {
-							showAttackTable(attackTables.get(MAGE));
-						}
-					} else {
-						hideExtraTables();
-					}
-				}
-			}
-		});
-		//Creating cast button:
-		final TextButton castb = new TextButton("Cast", skin, "mainbutton");	
-		castb.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				if(!castb.isDisabled()) {    //check if disabled                 
-					if(castb.isChecked()) {  //check if click made button checked
-						hideExtraTables();
-						if(turnQueue.first() instanceof Warrior) {
-							showCastTable(castTables.get(WARRIOR));
-						} else if(turnQueue.first() instanceof Rogue) {
-							showCastTable(castTables.get(ROGUE));
-						} else if(turnQueue.first() instanceof Mage) {
-							showCastTable(castTables.get(MAGE));
-						}
-					} else {
-						hideExtraTables();
-					}
-				}
-			}
-		});
-		//Creating item button:
-		final TextButton itemb = new TextButton("Item", skin, "mainbutton");
-		itemb.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				if(!itemb.isDisabled()) {
-					
-				}
-			}
-		});
-		//Creating run button:
-		final TextButton runb = new TextButton("Run", skin, "mainbutton");
-		runb.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				if(!runb.isDisabled()) {
-					gsm.popState();
-				}
-			}
-		});
-		
-		//Buttongroup for mainbuttons
-		mainbuttongroup = new ButtonGroup<TextButton>(attackb, castb, itemb, runb);
-		mainbuttongroup.setMaxCheckCount(1);
-		mainbuttongroup.setMinCheckCount(0);
-		mainbuttongroup.setUncheckLast(true);
-		
-		mainButtonTable.columnDefaults(0).width(mastertable.getWidth() * 0.41f).height(mastertable.getHeight() * 0.251f).top();
-		mainButtonTable.add(attackb);
-		mainButtonTable.row();
-		mainButtonTable.add(castb);
-		mainButtonTable.row();
-		mainButtonTable.add(itemb);
-		mainButtonTable.row();
-		mainButtonTable.add(runb);
-		
-	}
-	
-	protected void showAttackTable(Table t) {
-		float tableHeight = 0;
-		for(Cell c : t.getCells()) {
-			tableHeight += c.getMinHeight();
-		}
-		Vector2 pos = mainbuttongroup.getChecked().localToStageCoordinates(new Vector2(0,0));
-		t.setPosition(pos.x + mainbuttongroup.getChecked().getWidth(), pos.y + tableHeight/4);
-		System.out.println("pos x:" +(pos.x + mainbuttongroup.getChecked().getWidth())+ " pos y:"+(pos.y + tableHeight));
-		stage.addActor(t);
-	}
-
-	protected void showCastTable(Table t) {
-		float tableHeight = 0;
-		for(Cell c : t.getCells()) {
-			tableHeight += c.getMinHeight();
-		}
-		Vector2 pos = mainbuttongroup.getChecked().localToStageCoordinates(new Vector2(0,0));
-		t.setPosition(pos.x + mainbuttongroup.getChecked().getWidth(), pos.y + tableHeight/4);
-		System.out.println("pos x:" +mainbuttongroup.getChecked().getX()+ " pos y:"+tableHeight );
-		stage.addActor(t);
+		chars.get(ROGUE).setXY(chars.get(ROGUE).getBattleposition().x, chars.get(ROGUE).getBattleposition().y);	
 	}
 	
 	@Override
@@ -436,6 +253,14 @@ public class NewBattle extends GameState {
 			}
 		}
 	}
+	
+	private void resetAction() {
+		turnQueue.first().setMoving(false);
+		steppedForvard = false;
+		activeAction = null;
+		actionFinished = false;
+		turnQueue.removeIndex(0);
+	}
 
 	private void checkManaLeftAndDisableButtons(Character c) {
 		int index = 10;
@@ -456,42 +281,10 @@ public class NewBattle extends GameState {
 			}
 		}
 	}
-
-	private void resetAction() {
-		turnQueue.first().setMoving(false);
-		steppedForvard = false;
-		activeAction = null;
-		actionFinished = false;
-		turnQueue.removeIndex(0);
-	}
 	
 	private void setMainButtonsDisabled(boolean b) {
 		for(TextButton tb : mainbuttongroup.getButtons()) {
 			tb.setDisabled(b);
-		}
-	}
-	
-	protected void setCharactersButtonsUnchecked(Character c) {
-		int index = 10;
-		if(c instanceof Warrior) {
-			index = WARRIOR;
-		} else if(c instanceof Rogue) {
-			index = ROGUE;
-		} else if(c instanceof Mage) {
-			index = MAGE;
-		}
-		if(index != 10) {
-			if(mainbuttongroup.getChecked() != null) {
-				mainbuttongroup.getChecked().setChecked(false);
-			}
-			
-			if(castbuttongroup.get(index).getChecked() != null) {
-				castbuttongroup.get(index).getChecked().setChecked(false);
-			}
-			
-			if(attackbuttongroup.get(index).getChecked() != null) {
-				attackbuttongroup.get(index).getChecked().setChecked(false);
-			}
 		}
 	}
 
@@ -533,15 +326,20 @@ public class NewBattle extends GameState {
 	@Override
 	public void render() {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		sb.setProjectionMatrix(hudCam.combined);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	
+		sb.setProjectionMatrix(stage.getCamera().combined);
+		stage.getViewport().apply();
+		stage.act();
+		stage.draw();
 		
+		sb.setProjectionMatrix(hudCam.combined);
 		viewport2.apply();
 		
-		sb.begin();
-			bg.draw(sb);
-			pointer.draw(sb);
-		sb.end();
+		if(activeAction == null) {
+			sb.begin();
+				pointer.draw(sb);
+			sb.end();
+		}
 		
 		//Characters
 		for(Character c : chars) {
@@ -553,9 +351,7 @@ public class NewBattle extends GameState {
 		}
 
 		if(activeAction != null) {
-			if(turnQueue.first() instanceof Warrior 
-					|| turnQueue.first() instanceof Mage 
-					|| turnQueue.first() instanceof Rogue) {
+			if(isPlayersTurn()) {
 				activeAction.render(sb, target);
 			}else {
 				activeAction.render(sb, enemyTarget);
@@ -564,41 +360,18 @@ public class NewBattle extends GameState {
 		sb.begin();
 			fpsfont.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 730, 470);
 		sb.end();
-		
-		sb.setProjectionMatrix(stage.getCamera().combined);
-		stage.getViewport().apply();
-		stage.act();
-		stage.draw();
 	}
 	
 	private void swapTarget() {
 		for(int i=0; i<enemies.size; i++) {
 			if(enemies.get(i).isAlive()) {
 				target = enemies.get(i);
+				pointer.setPosition(target.getX() + target.getTextureRegion().getRegionWidth()/2 - pointer.getWidth()/2, 
+						target.getY() + target.getTextureRegion().getRegionHeight());
 				break;
 			}
 		}
 	}
-	
-	private void initEnemies() {
-		if(enemies.size == 1) { 
-			enemies.get(0).setX(enemies.get(0).getBattleposition().x);
-			enemies.get(0).setY(enemies.get(0).getBattleposition().y);
-		} 
-		else if (enemies.size == 2) { 
-			for(int i=0; i < enemies.size; i++) {
-				enemies.get(i).setX(enemies.get(i).getBattleposition().x);
-				enemies.get(i).setY(enemies.get(i).getBattleposition().y);
-			}
-		} 
-		else if (enemies.size == 3){ 
-			for(int i=0; i < enemies.size; i++) {
-				enemies.get(i).setX(enemies.get(i).getBattleposition().x);
-				enemies.get(i).setY(enemies.get(i).getBattleposition().y);
-			}
-		}	
-	}
-	
 
 	@Override
 	public void resize(int w, int h) {
@@ -624,6 +397,86 @@ public class NewBattle extends GameState {
 		}
 	}
 	
+	
+	/* INITING BATTLE VARIABLES START */
+	
+	private void initEnemies() {
+		if(enemies.size == 1) { 
+			enemies.get(0).setX(enemies.get(0).getBattleposition().x);
+			enemies.get(0).setY(enemies.get(0).getBattleposition().y);
+		} 
+		else if (enemies.size == 2) { 
+			for(int i=0; i < enemies.size; i++) {
+				enemies.get(i).setX(enemies.get(i).getBattleposition().x);
+				enemies.get(i).setY(enemies.get(i).getBattleposition().y);
+			}
+		} 
+		else if (enemies.size == 3){ 
+			for(int i=0; i < enemies.size; i++) {
+				enemies.get(i).setX(enemies.get(i).getBattleposition().x);
+				enemies.get(i).setY(enemies.get(i).getBattleposition().y);
+			}
+		}	
+	}
+	
+	private void initAttackTables() {
+		attackTables = new Array<Table>();
+		attackbuttongroup = new Array<ButtonGroup<TextButton>>();
+		
+		for(final Character c : chars) {
+			Table table = new Table(skin);
+			ButtonGroup<TextButton> bg = new ButtonGroup<TextButton>();
+			bg.setMinCheckCount(0);
+			int i = 0;
+			for(final Skill s : c.getAttackAbilities()) { //Start of inner for
+				TextButton tb = null;
+				if( i == 0 && c.getAttackAbilities().size > 1) {
+					tb = new SkillTextButton(s.toString(), skin, "subbuttontop", s);				
+				} else if( i == c.getAttackAbilities().size-1 && c.getSpells().size > 1) {
+					tb = new SkillTextButton(s.toString(), skin, "subbuttonbot", s);
+				} else {
+					tb = new SkillTextButton(s.toString(), skin, "subbuttonmid", s);			
+				} 
+				tb.addListener(new SkillClickListener(tb, s, c));
+				bg.add(tb);
+				table.add(tb).width(mainButtonTable.getCells().get(0).getPrefWidth() * 0.5f).height(mainButtonTable.getCells().get(0).getPrefHeight() * 0.9f);
+				table.row();
+				i++;
+			} //end of inner for
+			attackbuttongroup.add(bg);
+			attackTables.add(table);
+		}// end of for
+	}
+
+	private void initCastTables() {
+		castTables = new Array<Table>();
+		castbuttongroup = new Array<ButtonGroup<TextButton>>();
+		
+		for(final Character c : chars) {
+			Table table = new Table(skin);
+			ButtonGroup<TextButton> bg = new ButtonGroup<TextButton>();
+			bg.setMinCheckCount(0);
+			int i = 0;
+			for(final Skill s : c.getSpells()) { //Start of inner for
+				TextButton tb = null;
+				if( i == 0 && c.getSpells().size > 1) {
+					tb = new SkillTextButton(s.toString(), skin, "subbuttontop", s);				
+				} else if( i == c.getSpells().size-1 && c.getSpells().size > 1) {
+					tb = new SkillTextButton(s.toString(), skin, "subbuttonbot", s);
+				} else {
+					tb = new SkillTextButton(s.toString(), skin, "subbuttonmid", s);			
+				} 
+				tb.addListener(new SkillClickListener(tb, s, c));
+				bg.add(tb);
+				table.add(tb).width(mainButtonTable.getCells().get(0).getPrefWidth() * 0.5f).height(mainButtonTable.getCells().get(0).getPrefHeight() * 0.9f);
+				table.row();
+				i++;
+			} //end of inner for
+			castbuttongroup.add(bg);
+			castTables.add(table);
+		}// end of for
+	}
+	/* Listener for subbuttons */
 	public class SkillClickListener extends ClickListener {
 		
 		private TextButton tb;
@@ -647,5 +500,149 @@ public class NewBattle extends GameState {
 			}
 		}
 	}
+	
+	protected void setCharactersButtonsUnchecked(Character c) {
+		int index = 10;
+		if(c instanceof Warrior) {
+			index = WARRIOR;
+		} else if(c instanceof Rogue) {
+			index = ROGUE;
+		} else if(c instanceof Mage) {
+			index = MAGE;
+		}
+		if(index != 10) {
+			if(mainbuttongroup.getChecked() != null) {
+				mainbuttongroup.getChecked().setChecked(false);
+			}
+			
+			if(castbuttongroup.get(index).getChecked() != null) {
+				castbuttongroup.get(index).getChecked().setChecked(false);
+			}
+			
+			if(attackbuttongroup.get(index).getChecked() != null) {
+				attackbuttongroup.get(index).getChecked().setChecked(false);
+			}
+		}
+	}
+	
+	private void initMainTable() {
+		mainButtonTable = new Table(skin);
+		
+		//Creating attack button:
+		final TextButton attackb = new TextButton("Attack", skin, "mainbutton");
+		attackb.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if(!attackb.isDisabled()) {		//check if disabled
+					if(attackb.isChecked()) {	//check if click made button checked
+						hideExtraTables();
+						if(turnQueue.first() instanceof Warrior) {
+							showAttackTable(attackTables.get(WARRIOR));
+						} else if(turnQueue.first() instanceof Rogue) {
+							showAttackTable(attackTables.get(ROGUE));
+						} else if(turnQueue.first() instanceof Mage) {
+							showAttackTable(attackTables.get(MAGE));
+						}
+					} else {
+						hideExtraTables();
+					}
+				}
+			}
+		});
+		//Creating cast button:
+		final TextButton castb = new TextButton("Cast", skin, "mainbutton");	
+		castb.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if(!castb.isDisabled()) {    //check if disabled                 
+					if(castb.isChecked()) {  //check if click made button checked
+						hideExtraTables();
+						if(turnQueue.first() instanceof Warrior) {
+							showCastTable(castTables.get(WARRIOR));
+						} else if(turnQueue.first() instanceof Rogue) {
+							showCastTable(castTables.get(ROGUE));
+						} else if(turnQueue.first() instanceof Mage) {
+							showCastTable(castTables.get(MAGE));
+						}
+					} else {
+						hideExtraTables();
+					}
+				}
+			}
+		});
+		//Creating item button:
+		final TextButton itemb = new TextButton("Item", skin, "mainbutton");
+		itemb.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if(!itemb.isDisabled()) {
+					
+				}
+			}
+		});
+		//Creating run button:
+		final TextButton runb = new TextButton("Run", skin, "mainbutton");
+		runb.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if(!runb.isDisabled()) {
+					gsm.popState();
+				}
+			}
+		});
+		
+		//Buttongroup for mainbuttons
+		mainbuttongroup = new ButtonGroup<TextButton>(attackb, castb, itemb, runb);
+		mainbuttongroup.setMaxCheckCount(1);
+		mainbuttongroup.setMinCheckCount(0);
+		mainbuttongroup.setUncheckLast(true);
+		
+		mainButtonTable.columnDefaults(0).width(mastertable.getWidth() * 0.41f).height(mastertable.getHeight() * 0.42f * 0.251f).top();
+		mainButtonTable.add(attackb);
+		mainButtonTable.row();
+		mainButtonTable.add(castb);
+		mainButtonTable.row();
+		mainButtonTable.add(itemb);
+		mainButtonTable.row();
+		mainButtonTable.add(runb);	
+	}
+	
 
+	protected void hideExtraTables() {
+		if(stage.getActors().size > 1) {
+			Iterator<Actor> i = stage.getActors().iterator();
+			i.next();
+			while (i.hasNext()) {
+			   Actor s = i.next();
+			   i.remove();
+			}
+		}
+		stage.getActors().shrink();
+	}
+	
+	protected void showAttackTable(Table t) {
+		float tableHeight = 0;
+		for(Cell c : t.getCells()) {
+			tableHeight += c.getMinHeight();
+		}
+		Vector2 pos = mainbuttongroup.getChecked().localToStageCoordinates(new Vector2(0,0));
+		t.setPosition(pos.x + mainbuttongroup.getChecked().getWidth(), pos.y + tableHeight/4);
+		System.out.println("pos x:" +(pos.x + mainbuttongroup.getChecked().getWidth())+ " pos y:"+(pos.y + tableHeight));
+		stage.addActor(t);
+	}
+
+	protected void showCastTable(Table t) {
+		float tableHeight = 0;
+		for(Cell c : t.getCells()) {
+			tableHeight += c.getMinHeight();
+		}
+		Vector2 pos = mainbuttongroup.getChecked().localToStageCoordinates(new Vector2(0,0));
+		t.setPosition(pos.x + mainbuttongroup.getChecked().getWidth(), pos.y + tableHeight/4);
+		System.out.println("pos x:" +mainbuttongroup.getChecked().getX()+ " pos y:"+tableHeight );
+		stage.addActor(t);
+	}
+	
+	private void initSideTable() {
+		
+	}
 }

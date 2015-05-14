@@ -174,6 +174,8 @@ public class Play extends GameState {
 		playerCharacters.get(WARRIOR).addSpell(specialspell);
 		playerCharacters.get(WARRIOR).addSpell(specialspell);
 		playerCharacters.get(WARRIOR).addSpell(specialspell);
+		playerCharacters.get(WARRIOR).addSpell(specialspell);
+		playerCharacters.get(WARRIOR).addSpell(specialspell);
 		
 		playerCharacters.get(MAGE).addAttackAbility(defaultattack);
 		playerCharacters.get(MAGE).addAttackAbility(specialattack);
