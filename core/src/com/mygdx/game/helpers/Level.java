@@ -64,24 +64,24 @@ public class Level {
 			Skeleton s;
 			Array<Character> enemies = new Array<Character>();
 			if(i < 17) { 
-				s = new Skeleton((int)((i+1) * Game.WIDTH * 0.825), (int)(Game.HEIGHT * 0.18), 10f, 120f, 20f, 4, 10, 12, skeletonAi);
+				s = new Skeleton((int)((i+1) * Game.VIRTUAL_WIDTH * 0.825), (int)(Game.VIRTUAL_HEIGHT * 0.18), 10f, 120f, 20f, 4, 10, 12, skeletonAi);
 				s.setTextureRegion(enemyAtlas.findRegion(SKELETON_IMG));
-				s.setBattleposition(new Vector2((int)(Game.WIDTH * 0.825), (int)(Game.HEIGHT * 0.63)));
+				s.setBattleposition(new Vector2((int)(Game.VIRTUAL_WIDTH * 0.825), (int)(Game.VIRTUAL_HEIGHT * 0.63)));
 				enemies.add(s);
 			} 
 			else if (i < 34) { 
 				for(int j=0; j<2; j++) {
-					s = new Skeleton((int)((i+1) * Game.WIDTH * (0.825+j*0.01)), (int)(Game.HEIGHT * (0.25-j*0.2)), 80f, 120f, 20f, 4, 10, 12, skeletonAi);
+					s = new Skeleton((int)((i+1) * Game.VIRTUAL_WIDTH * (0.825+j*0.01)), (int)(Game.VIRTUAL_HEIGHT * (0.25-j*0.2)), 80f, 120f, 20f, 4, 10, 12, skeletonAi);
 					s.setTextureRegion(enemyAtlas.findRegion(SKELETON_IMG));
-					s.setBattleposition(new Vector2((int)(Game.WIDTH * (0.825+j*0.01)), (int)(Game.HEIGHT * (0.67-j*0.2))));
+					s.setBattleposition(new Vector2((int)(Game.VIRTUAL_WIDTH * (0.825+j*0.01)), (int)(Game.VIRTUAL_HEIGHT * (0.67-j*0.2))));
 					enemies.add(s);
 				}
 			} 
 			else { 
 				for(int j=0; j<3; j++){
-					s = new Skeleton((int)((i+1) * Game.WIDTH * (0.825+j*0.01)), (int)(Game.HEIGHT * (0.32-j*0.15)), 80f, 120f, 20f, 4, 10, 12, skeletonAi);
+					s = new Skeleton((int)((i+1) * Game.VIRTUAL_WIDTH * (0.825+j*0.01)), (int)(Game.VIRTUAL_HEIGHT * (0.32-j*0.15)), 80f, 120f, 20f, 4, 10, 12, skeletonAi);
 					s.setTextureRegion(enemyAtlas.findRegion(SKELETON_IMG));
-					s.setBattleposition(new Vector2((int)(Game.WIDTH * (0.825+j*0.01)), (int)(Game.HEIGHT * (0.73-j*0.15))));
+					s.setBattleposition(new Vector2((int)(Game.VIRTUAL_WIDTH * (0.825+j*0.01)), (int)(Game.VIRTUAL_HEIGHT * (0.73-j*0.15))));
 					enemies.add(s);
 				}
 			}	
@@ -94,7 +94,7 @@ public class Level {
 	
 	private void createEnemyAnimations() {	
 		Animation skelmoving = Utils.createAnimation(enemyAtlas, SKELETON_MOVING_IMG, 2, 1/10f);
-		Animation skelattacking = Utils.createAnimation(enemyAtlas, SKELETON_ATTACK_IMG, 6, 1/9f);
+		Animation skelattacking = Utils.createAnimation(enemyAtlas, SKELETON_ATTACK_IMG, 6, 1/5f);
 		for(Array<Character> a  : enemywaves){
 			for(Character c : a){
 				c.setAttackAnimation(skelattacking);
@@ -134,11 +134,11 @@ public class Level {
 	public void render(SpriteBatch sb) {
 		sb.begin();
 		for(int i=0; i < 51; i++) {
-			sb.draw(bg, -Game.WIDTH + i*Game.WIDTH, 0);
+			sb.draw(bg, -Game.VIRTUAL_WIDTH + i*Game.VIRTUAL_WIDTH, 0);
 		}
 		
 		for(int i=0; i<100; i++){
-			sb.draw(window, Game.WIDTH/2 + i*Game.WIDTH/2, Game.HEIGHT * 0.73f);
+			sb.draw(window, Game.VIRTUAL_WIDTH/2 + i*Game.VIRTUAL_WIDTH/2, Game.VIRTUAL_HEIGHT * 0.73f);
 		}
 		sb.end();
 		//TODO: Have to check how to only draw when visible

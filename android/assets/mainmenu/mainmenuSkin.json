@@ -1,0 +1,9 @@
+{
+	"com.badlogic.gdx.graphics.g2d.BitmapFont": {
+		"buttonfont": 	{ "file": "fonts/menu/sidebuttonfont.fnt" }
+	},
+
+	"com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+		"button": { "up": "button.up", "down": "button.down", "checked": "button.down", "font": buttonfont }
+	}
+}

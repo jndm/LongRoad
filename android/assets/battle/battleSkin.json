@@ -6,7 +6,9 @@
 	
 	"com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
 		"maintext":    	{ "font": mainbuttonfont },
-		"subtext":   	{ "font": subbuttonfont  }
+		"subtext":   	{ "font": subbuttonfont  },
+		"sidebarname": 	{ "font": mainbuttonfont },
+		"sidebarstats": { "font": subbuttonfont  }
 	},
 	
 	"com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {

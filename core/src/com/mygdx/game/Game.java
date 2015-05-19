@@ -7,15 +7,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.handlers.GameStateManager;
 
 public class Game implements ApplicationListener {
 	
 	public static final String TITLE = "Longroad";
-	public static final int WIDTH = 800;
-	public static final int HEIGHT = 480;
-	public static final int WORLD_WIDTH = 40000;
-	public static final float ASPECT_RATIO = (float)WIDTH / (float)HEIGHT;
+	public static final int VIRTUAL_WIDTH = 800;
+	public static final int VIRTUAL_HEIGHT = 480;
+	public static final float ASPECT_RATIO = (float)VIRTUAL_WIDTH / (float)VIRTUAL_HEIGHT;
 	
 	public static final float STEP = 1 / 60f;
 	
@@ -26,17 +26,19 @@ public class Game implements ApplicationListener {
 	private GameStateManager gsm;
 	private AssetManager assetManager;
 	private Viewport viewport, viewport2;
+	private Party party;
 	
 	public void create() {
 		
 		assetManager = new AssetManager();
 		sb = new SpriteBatch();
 		cam = new OrthographicCamera();
-		cam.setToOrtho(false, WIDTH, HEIGHT);
-		viewport = new FillViewport(WIDTH * ASPECT_RATIO, HEIGHT, cam);
+		cam.setToOrtho(false, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+		viewport = new FillViewport(VIRTUAL_WIDTH * ASPECT_RATIO, VIRTUAL_HEIGHT, cam);
 		hudCam = new OrthographicCamera();
-		hudCam.setToOrtho(false, WIDTH, HEIGHT);
-		viewport2 = new FillViewport(WIDTH * ASPECT_RATIO, HEIGHT, hudCam);
+		hudCam.setToOrtho(false, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+		viewport2 = new FillViewport(VIRTUAL_WIDTH * ASPECT_RATIO, VIRTUAL_HEIGHT, hudCam);
+		party = new Party(this);
 		
 		gsm = new GameStateManager(this);
 		
@@ -62,6 +64,7 @@ public class Game implements ApplicationListener {
 	public AssetManager getAssetManger() { return assetManager; }	
 	public Viewport getViewport() { return viewport; }
 	public Viewport getViewport2() { return viewport2; }
+	public Party getParty() { return party; }
 
 	public void pause() {}
 	public void resume() {}

@@ -8,6 +8,7 @@ import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.states.Battle;
 import com.mygdx.game.states.GameState;
+import com.mygdx.game.states.MainMenu;
 import com.mygdx.game.states.Menu;
 import com.mygdx.game.states.OldBattle;
 import com.mygdx.game.states.Play;
@@ -18,6 +19,7 @@ public class GameStateManager {
 	
 	private Stack<GameState> gameStates;
 	
+	public static final int MAINMENU = 0;
 	public static final int PLAY = 1;
 	public static final int BATTLE = 2;
 	public static final int MENU = 3;
@@ -25,9 +27,13 @@ public class GameStateManager {
 	public GameStateManager(Game game) {
 		this.game = game;
 		gameStates = new Stack<GameState>();
-		pushState(PLAY);
+		pushMainMenuState();
 	}
 	
+	public void pushMainMenuState() {
+		gameStates.push(new MainMenu(this));
+	}
+
 	public Game game() { return game; }
 	
 	public void update(float dt) {
@@ -38,27 +44,16 @@ public class GameStateManager {
 		gameStates.peek().render();
 	}
 	
-	private GameState getState(int state) {
-		if(state == PLAY) return new Play(this);
-		if(state == BATTLE) return new OldBattle(this);
-		return null;
+	public void pushBattleState(int state, Array<Character> array) {
+		gameStates.push(new Battle(this, array)); 
 	}
 	
-	public void setState(int state) {
-		popState();
-		pushState(state);
+	public void pushMenuState(int state) {
+		gameStates.push(new Menu(this)); 
 	}
 	
-	public void pushBattleState(int state, Array<Character> array, Party party) {
-		gameStates.push(new Battle(this, array, party)); 
-	}
-	
-	public void pushMainMenuState(int state, Party party) {
-		gameStates.push(new Menu(this, party)); 
-	}
-	
-	public void pushState(int state) {
-		gameStates.push(getState(state));
+	public void pushPlayState() {
+		gameStates.push(new Play(this));
 	}
 	
 	public void popState() {

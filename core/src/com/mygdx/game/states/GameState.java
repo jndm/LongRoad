@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Game;
+import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.handlers.GameStateManager;
 
 public abstract class GameState {
@@ -17,6 +18,7 @@ public abstract class GameState {
 	protected OrthographicCamera cam;
 	protected OrthographicCamera hudCam;
 	protected Viewport viewport, viewport2;
+	protected Party party;
 	
 	protected GameState(GameStateManager gsm) {
 		this.gsm = gsm;
@@ -27,6 +29,7 @@ public abstract class GameState {
 		assets = game.getAssetManger();
 		viewport = game.getViewport();
 		viewport2 = game.getViewport2();
+		party = game.getParty();
 	}
 	
 	public abstract void update(float dt);

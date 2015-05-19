@@ -14,9 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
@@ -42,9 +46,12 @@ public class Battle extends GameState {
 	private Character target;
 	private Character enemyTarget;
 	private Vector2 oldMagePosition, oldWarriorPosition, oldRoguePosition;
+	private Array<ProgressBar> hpbars;
+	private Array<ProgressBar> manabars;
+	private Array<Label> statustexts;
 	
 	//Needed for playing action
-	private final float ACTIONMOVEMAX = Game.WIDTH * 0.375f;
+	private final float ACTIONMOVEMAX = Game.VIRTUAL_WIDTH * 0.375f;
 	private boolean steppedForvard = false;
 	private boolean actionFinished = false;
 	private int deadPlayerCharacters = 0;
@@ -54,6 +61,7 @@ public class Battle extends GameState {
 	private final float WAIT_TIME = 1f;
 	private float timeElapsed = 0;
 	
+	//For buttons scene2d
 	private TextureAtlas atlas;
 	private Stage stage;
 	private Skin skin;
@@ -76,7 +84,7 @@ public class Battle extends GameState {
 		super(gsm);
 	}
 
-	public Battle(GameStateManager gsm, Array<Character> enemies, Party party) {
+	public Battle(GameStateManager gsm, Array<Character> enemies) {
 		super(gsm);
 		this.enemies = enemies;
 		this.chars = party.getCharacters();
@@ -103,14 +111,12 @@ public class Battle extends GameState {
 			checkManaLeftAndDisableButtons(c);
 		}
 		mastertable.add(new Image(atlas.findRegion("background"))).colspan(2).fill().expand();
-		mastertable.row();
+		mastertable.row().height(Gdx.graphics.getHeight() * 0.42f);
 		mastertable.add(mainButtonTable).left();
-		mastertable.add().fillX().expandX();
-		mastertable.debug();
+		mastertable.add(sideTable).fillX().expandX();
 		stage.addActor(mastertable);
 		
-		Gdx.input.setInputProcessor(stage);	
-		stage.addActor(mastertable);
+		Gdx.input.setInputProcessor(stage);
 		
 		//Setup other stuff
 		initEnemies();
@@ -120,9 +126,9 @@ public class Battle extends GameState {
 		pointer.setPosition(target.getX() + target.getTextureRegion().getRegionWidth()/2 - pointer.getWidth()/2, 
 				target.getY() + target.getTextureRegion().getRegionHeight());
 		
-		oldMagePosition 	= new Vector2(chars.get(MAGE).getX(), chars.get(MAGE).getY());
-		oldWarriorPosition 	= new Vector2(chars.get(WARRIOR).getX(), chars.get(WARRIOR).getY());
-		oldRoguePosition 	= new Vector2(chars.get(ROGUE).getX(), chars.get(ROGUE).getY());
+		oldMagePosition = new Vector2(chars.get(MAGE).getX(), chars.get(MAGE).getY());
+		oldWarriorPosition = new Vector2(chars.get(WARRIOR).getX(), chars.get(WARRIOR).getY());
+		oldRoguePosition = new Vector2(chars.get(ROGUE).getX(), chars.get(ROGUE).getY());
 		
 		chars.get(MAGE).setXY(chars.get(MAGE).getBattleposition().x, chars.get(MAGE).getBattleposition().y);
 		chars.get(WARRIOR).setXY(chars.get(WARRIOR).getBattleposition().x, chars.get(WARRIOR).getBattleposition().y);
@@ -131,7 +137,7 @@ public class Battle extends GameState {
 	
 	@Override
 	public void update(float dt) {
-		
+		updateManaAndHpForSideBar();
 		for(Character c : chars) {
 			checkManaLeftAndDisableButtons(c);
 		}
@@ -165,11 +171,19 @@ public class Battle extends GameState {
 		}
 	}
 	
+	private void updateManaAndHpForSideBar() {
+		for(int i=0; i<chars.size; i++) {
+			hpbars.get(i).setValue(chars.get(i).getHp());
+			manabars.get(i).setValue(chars.get(i).getMana());
+			statustexts.get(i).setText(chars.get(i).getHp()+"/"+chars.get(i).getMaxHp()+"hp\n"+chars.get(i).getMana()+"/"+chars.get(i).getMaxMana()+"mp");
+		}
+	}
+
 	private void doActiveEnemyAction(float dt) {
 		//ACTION STEP: MOVE FORWARD -> DO ANIMATION -> CHECK IF PLAYERCHAR IS DEAD -> MOVE BACK -> CHECK IF ALL PLAYERCHARS ARE DEAD AND LOSE	
 		//Move forward if character's x smaller than setted variable
 		if(!steppedForvard){
-			if(turnQueue.first().getX() > Game.WIDTH - ACTIONMOVEMAX){
+			if(turnQueue.first().getX() > Game.VIRTUAL_WIDTH - ACTIONMOVEMAX){
 				turnQueue.first().moveBackward(dt);	
 			}else {
 				steppedForvard = true;
@@ -219,7 +233,7 @@ public class Battle extends GameState {
 			}else {
 				steppedForvard = true;
 				turnQueue.first().setMoving(false);
-				turnQueue.first().setAttacking(true);	//Set actFinished false so the animation will be played
+				turnQueue.first().setAttacking(true);	//Set attacking true so the animation will be played
 			}
 		}
 		
@@ -233,17 +247,17 @@ public class Battle extends GameState {
 		//move back and set activeAction back to null and remove character from turnQueue
 		if(steppedForvard && !turnQueue.first().isAttacking()) {
 			if(target.isAlive() && target.getHp() < 0) {						//Check if enemy died
-					System.out.println(target.getClass().getSimpleName() + "died!");
-					target.setAlive(false);
-					deadEnemies++;
-					swapTarget();
+				System.out.println(target.getClass().getSimpleName() + "died!");
+				target.setAlive(false);
+				deadEnemies++;
+				swapTarget();
 			}
 			if(turnQueue.first().getX() > turnQueue.first().getBattleposition().x) {
 				turnQueue.first().moveBackward(dt);
 			} else {
 				resetAction();
 				if(deadEnemies == enemies.size) {	//If all enemies are dead win battle
-					System.out.println("WINNER!");
+					party.setBattleWon(true);
 					gsm.popState();
 				}
 			}
@@ -340,19 +354,18 @@ public class Battle extends GameState {
 		//Characters
 		for(Character c : chars) {
 			c.render(sb);
+			if(activeAction != null && !isPlayersTurn() && enemyTarget == c) {
+				activeAction.render(sb, enemyTarget);
+			}
 		}
 		
 		for(Character c : enemies) {
 			c.render(sb);
-		}
-
-		if(activeAction != null) {
-			if(isPlayersTurn()) {
+			if(activeAction != null && isPlayersTurn() && target == c) {
 				activeAction.render(sb, target);
-			}else {
-				activeAction.render(sb, enemyTarget);
 			}
 		}
+		
 		sb.begin();
 			fpsfont.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 730, 470);
 		sb.end();
@@ -487,12 +500,10 @@ public class Battle extends GameState {
 		
 		@Override
 		public void clicked(InputEvent event, float x, float y) {
-			System.out.println("ASDASDA");
 			if(!tb.isDisabled()) {
 				activeAction = s;
 				hideExtraTables();
 				setCharactersButtonsUnchecked(c);
-				System.out.println("ASDASDA");
 			}
 		}
 	}
@@ -593,7 +604,7 @@ public class Battle extends GameState {
 		mainbuttongroup.setMinCheckCount(0);
 		mainbuttongroup.setUncheckLast(true);
 		
-		mainButtonTable.columnDefaults(0).width(mastertable.getWidth() * 0.41f).height(mastertable.getHeight() * 0.42f * 0.251f).top();
+		mainButtonTable.columnDefaults(0).width(mastertable.getWidth() * 0.41f).fillY().expandY().top();
 		mainButtonTable.add(attackb);
 		mainButtonTable.row();
 		mainButtonTable.add(castb);
@@ -639,6 +650,67 @@ public class Battle extends GameState {
 	}
 	
 	private void initSideTable() {
+		sideTable = new Table(skin);
+		sideTable.setBackground("sidebg");
 		
+		//Create hp- and manabars
+		hpbars = new Array<ProgressBar>();
+		manabars = new Array<ProgressBar>();
+		
+		//Hpbar style
+		ProgressBarStyle hppbs = new ProgressBarStyle();
+		hppbs.background = skin.getDrawable("healthbarbg");
+		hppbs.knobBefore = skin.getDrawable("healthbarfill");
+		hppbs.knobBefore.setMinWidth(0f);	//Override default min width which is bigger than 0
+		
+		//Manabar style
+		ProgressBarStyle manapbs = new ProgressBarStyle();
+		manapbs.background = skin.getDrawable("healthbarbg");
+		manapbs.knobBefore = skin.getDrawable("manabarfill");
+		manapbs.knobBefore.setMinWidth(0f);	//Override default min width which is bigger than 0
+		
+		//Create table for bars and add to array for changing the value later:
+		Array<Table> bars = new Array<Table>();
+		for(Character c : chars) {
+			Table t = new Table();
+			//Hp bar
+			ProgressBar pb = new ProgressBar(0, c.getMaxHp(), c.getMaxHp()/100, false, hppbs);	//Create progressbar, 1 step is 1% of hp
+			pb.setValue(c.getHp());
+			hpbars.add(pb);
+			t.add(pb).width(Gdx.graphics.getWidth() * 0.08f).spaceBottom(Gdx.graphics.getHeight() * 0.01f);
+			
+			t.row();
+			
+			//Mana bar
+			pb = new ProgressBar(0, c.getMaxMana(), c.getMaxMana()/100, false, manapbs);	//Create progressbar, 1 step is 1% of mana
+			pb.setValue(c.getMana());
+			manabars.add(pb);
+			t.add(pb).width(Gdx.graphics.getWidth() * 0.08f);
+			
+			bars.add(t);	//add table to array
+		}
+		
+		//Create statustexts:
+		statustexts = new Array<Label>();
+		for(int i=0; i<chars.size; i++) {
+			Label status = new Label(chars.get(i).getHp()+"/"+chars.get(i).getMaxHp()+"hp\n"+chars.get(i).getMana()+"/"+chars.get(i).getMaxMana()+"mp", skin, "sidebarstats");
+			status.setFontScale(Gdx.graphics.getWidth() / Game.VIRTUAL_WIDTH, Gdx.graphics.getHeight() / Game.VIRTUAL_HEIGHT);
+			statustexts.add(status);
+		}
+		
+		//Create sidetable
+		for(int i=0; i<chars.size; i++) {
+			sideTable.add().width(Gdx.graphics.getWidth() * 0.05f); //add empty column so text won't go over the border
+			
+			Label name = new Label(chars.get(i).getName(), skin, "sidebarname");
+			name.setFontScale(Gdx.graphics.getWidth() / Game.VIRTUAL_WIDTH, Gdx.graphics.getHeight() / Game.VIRTUAL_HEIGHT);
+			sideTable.add(name).fill().expand().center();		
+			sideTable.add(statustexts.get(i)).spaceRight(Gdx.graphics.getWidth() * 0.02f).fillY().expandY().left();		
+			sideTable.add(bars.get(i)).fillY().expandY();
+			
+			sideTable.add().width(Gdx.graphics.getWidth() * 0.05f);	//add empty column to line every columns left
+			sideTable.row();
+		}
+		//sideTable.debug();
 	}
 }

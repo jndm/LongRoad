@@ -13,24 +13,28 @@ public abstract class Skill {
 	protected int dmg = 0;
 	protected Animation animation;
 	private BitmapFont font = new BitmapFont();
-	private float fontx, fonty;
+	private float fontx, fonty, maxfonty;
 	protected float manareq;
 	
 	public abstract void act(Character actor, Character target);
 	
 	public void render(SpriteBatch sb, Character target) {
 		if(!animation.isAnimationFinished(elapsedTime)) {	
-			sb.begin();
-			elapsedTime += Gdx.graphics.getDeltaTime();
+			sb.begin();	
+			elapsedTime += Gdx.graphics.getDeltaTime();	
 			sb.draw(animation.getKeyFrame(elapsedTime, false), target.getX(), target.getY() + target.getTextureRegion().getRegionHeight()/3);
-			font.draw(sb, dmg+"", fontx, fonty++);
+			font.draw(sb, dmg+"", fontx, fonty);
+			if(fonty < maxfonty) {
+				fonty++;
+			}
 			sb.end();
-		}	
+		}
 	}
 	
 	protected void startAnimation(Character target) {
 		fontx = target.getX() + target.getTextureRegion().getRegionWidth()/2 - font.getBounds(dmg+"").width/2;
-		fonty = target.getY() + target.getTextureRegion().getRegionHeight() * 0.8f;
+		fonty = target.getY() + target.getTextureRegion().getRegionHeight() * 0.9f;
+		maxfonty = target.getY() + target.getTextureRegion().getRegionHeight() + 20f;
 		elapsedTime = 0;
 	}
 	

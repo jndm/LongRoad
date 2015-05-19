@@ -28,6 +28,7 @@ public class Party {
 	private float xpToLevelUp = 100;
 	private Array<Character> characters;
 	public static Array<Item> items;
+	private boolean battleWon = false;
 	
 	private final int MAGE = 0;
 	private final int WARRIOR = 1;
@@ -75,9 +76,9 @@ public class Party {
 	}
 	
 	private void createAnimations() {
-		characters.get(WARRIOR).setAttackAnimation(Utils.createAnimation(atlas, WARRIOR_ATTACK_IMG, 6, 1/9f));
-		characters.get(MAGE).setAttackAnimation(Utils.createAnimation(atlas, MAGE_ATTACK_IMG, 6, 1/9f));
-		characters.get(ROGUE).setAttackAnimation(Utils.createAnimation(atlas, ROGUE_ATTACK_IMG, 6, 1/9f));
+		characters.get(WARRIOR).setAttackAnimation(Utils.createAnimation(atlas, WARRIOR_ATTACK_IMG, 6, 1/5f));
+		characters.get(MAGE).setAttackAnimation(Utils.createAnimation(atlas, MAGE_ATTACK_IMG, 6, 1/5f));
+		characters.get(ROGUE).setAttackAnimation(Utils.createAnimation(atlas, ROGUE_ATTACK_IMG, 6, 1/5f));
 		
 		characters.get(WARRIOR).setMovingAnimation(Utils.createAnimation(atlas, WARRIOR_WALKING_IMG, 2, 1/10f));
 		characters.get(MAGE).setMovingAnimation(Utils.createAnimation(atlas, MAGE_WALKING_IMG, 2, 1/10f));
@@ -161,5 +162,13 @@ public class Party {
 
 	public Array<Character> getCharacters() {
 		return characters;
+	}
+
+	public boolean isBattleWon() {
+		return battleWon;
+	}
+
+	public void setBattleWon(boolean battleWon) {
+		this.battleWon = battleWon;
 	}
 } 

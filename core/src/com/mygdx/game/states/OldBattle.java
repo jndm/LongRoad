@@ -270,7 +270,7 @@ public class OldBattle extends GameState {
 		//ACTION STEP: MOVE FORWARD -> DO ANIMATION -> CHECK IF PLAYERCHAR IS DEAD -> MOVE BACK -> CHECK IF ALL PLAYERCHARS ARE DEAD AND LOSE	
 		//Move forward if character's x smaller than setted variable
 		if(!steppedForvard){
-			if(turnQueue.first().getX() > Game.WIDTH - ACTIONMOVEMAX){
+			if(turnQueue.first().getX() > Game.VIRTUAL_WIDTH - ACTIONMOVEMAX){
 				turnQueue.first().moveBackward(dt);	
 			}else {
 				steppedForvard = true;
@@ -390,7 +390,7 @@ public class OldBattle extends GameState {
 		sb.setProjectionMatrix(hudCam.combined);
 
 		sb.begin();
-			sb.draw(bg, 0, Game.HEIGHT - bg.getRegionHeight());
+			sb.draw(bg, 0, Game.VIRTUAL_HEIGHT - bg.getRegionHeight());
 			sb.draw(mainbuttonbg, 0, 0);
 			for(int i=0; i<playerCharacters.size; i++){
 				mainfont.draw(sb, playerCharacters.get(i).getName()+" ", 
@@ -788,8 +788,8 @@ public class OldBattle extends GameState {
 			for(Character e : enemies) {
 				if(Gdx.input.getX() > e.getX() 
 					&& Gdx.input.getX() < e.getX() + e.getTextureRegion().getRegionWidth() 
-					&& Game.HEIGHT - Gdx.input.getY() > e.getY() 
-					&& Game.HEIGHT - Gdx.input.getY() < e.getY() + e.getTextureRegion().getRegionHeight()
+					&& Game.VIRTUAL_HEIGHT - Gdx.input.getY() > e.getY() 
+					&& Game.VIRTUAL_HEIGHT - Gdx.input.getY() < e.getY() + e.getTextureRegion().getRegionHeight()
 					&& e.isAlive()) {
 						target = e;
 						System.out.println("Target set: "+ e.getClass().getSimpleName());

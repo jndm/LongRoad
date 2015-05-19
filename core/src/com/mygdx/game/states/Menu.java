@@ -35,12 +35,8 @@ public class Menu extends GameState {
 	private Button exitButton;
 
 	private final String MENUATLAS = "menu/menuassets.pack";
-		
-	protected Menu(GameStateManager gsm) {
-		super(gsm);
-	}
 	
-	public Menu(final GameStateManager gsm, Party party) {
+	public Menu(final GameStateManager gsm) {
 		super(gsm);	
 		playerCharacters = party.getCharacters();
 		assets.load(MENUATLAS, TextureAtlas.class);
