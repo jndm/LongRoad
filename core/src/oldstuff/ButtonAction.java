@@ -1,4 +1,4 @@
-package com.mygdx.game.helpers;
+package oldstuff;
 
 public enum ButtonAction {
 	//Main button actions:

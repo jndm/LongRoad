@@ -1,4 +1,4 @@
-package com.mygdx.game.states;
+package oldstuff;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -22,8 +22,7 @@ import com.mygdx.game.elements.characters.Warrior;
 import com.mygdx.game.elements.items.Item;
 import com.mygdx.game.elements.skills.Skill;
 import com.mygdx.game.handlers.GameStateManager;
-import com.mygdx.game.helpers.Button;
-import com.mygdx.game.helpers.ButtonAction;
+import com.mygdx.game.states.GameState;
 
 public class OldBattle extends GameState {
 	

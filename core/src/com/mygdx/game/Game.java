@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.handlers.GameStateManager;
+import com.mygdx.game.handlers.Party;
 
 public class Game implements ApplicationListener {
 	

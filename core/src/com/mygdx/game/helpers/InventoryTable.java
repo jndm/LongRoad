@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.elements.characters.Character;
-import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.elements.items.Potion;
+import com.mygdx.game.handlers.Party;
 import com.mygdx.game.states.Menu;
 import com.mygdx.game.states.Play;
 

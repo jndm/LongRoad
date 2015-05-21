@@ -4,6 +4,6 @@
 	},
 
 	"com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
-		"button": { "up": "button.up", "down": "button.down", "checked": "button.down", "font": buttonfont }
+		"button": { "up": "button.up", "down": "button.down", "font": buttonfont }
 	}
 }

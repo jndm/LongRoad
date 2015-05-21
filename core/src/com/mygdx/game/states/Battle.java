@@ -26,18 +26,20 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.characters.Character;
 import com.mygdx.game.elements.characters.Mage;
-import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.elements.characters.Rogue;
 import com.mygdx.game.elements.characters.Warrior;
 import com.mygdx.game.elements.items.Item;
 import com.mygdx.game.elements.skills.Skill;
 import com.mygdx.game.handlers.GameStateManager;
+import com.mygdx.game.handlers.Party;
+import com.mygdx.game.helpers.Constants;
 import com.mygdx.game.helpers.SkillTextButton;
 
 public class Battle extends GameState {
 
-	private Sprite pointer;
+	private boolean battleWon = false;
 	
+	private Sprite pointer;
 	private Array<Character> enemies;
 	private Array<Character> chars;
 	private Array<Item> items;
@@ -54,7 +56,6 @@ public class Battle extends GameState {
 	private final float ACTIONMOVEMAX = Game.VIRTUAL_WIDTH * 0.375f;
 	private boolean steppedForvard = false;
 	private boolean actionFinished = false;
-	private int deadPlayerCharacters = 0;
 	private int deadEnemies = 0;
 
 	//For charging
@@ -66,6 +67,7 @@ public class Battle extends GameState {
 	private Stage stage;
 	private Skin skin;
 	
+	//Scene2d stuff
 	private Table mastertable, mainButtonTable, sideTable;
 	private Array<Table> attackTables;
 	private Array<Table> castTables;
@@ -73,11 +75,6 @@ public class Battle extends GameState {
 	private Array<ButtonGroup<TextButton>> attackbuttongroup;
 	private Array<ButtonGroup<TextButton>> castbuttongroup;
 	
-	private final int MAGE = 0;
-	private final int WARRIOR = 1;
-	private final int ROGUE = 2;
-	
-	private final String BATTLEATLAS = "battle/battleassets.pack";
 	private BitmapFont fpsfont = new BitmapFont();
 	
 	protected Battle(GameStateManager gsm) {
@@ -89,10 +86,10 @@ public class Battle extends GameState {
 		this.enemies = enemies;
 		this.chars = party.getCharacters();
 		
-		assets.load(BATTLEATLAS, TextureAtlas.class);
+		assets.load(Constants.BATTLEATLAS, TextureAtlas.class);
 		assets.finishLoading();
 		
-		atlas = assets.get(BATTLEATLAS);
+		atlas = assets.get(Constants.BATTLEATLAS);
 		
 		//Setup bottom table
 		stage = new Stage();
@@ -126,13 +123,13 @@ public class Battle extends GameState {
 		pointer.setPosition(target.getX() + target.getTextureRegion().getRegionWidth()/2 - pointer.getWidth()/2, 
 				target.getY() + target.getTextureRegion().getRegionHeight());
 		
-		oldMagePosition = new Vector2(chars.get(MAGE).getX(), chars.get(MAGE).getY());
-		oldWarriorPosition = new Vector2(chars.get(WARRIOR).getX(), chars.get(WARRIOR).getY());
-		oldRoguePosition = new Vector2(chars.get(ROGUE).getX(), chars.get(ROGUE).getY());
+		oldMagePosition = new Vector2(chars.get(Constants.MAGE).getX(), chars.get(Constants.MAGE).getY());
+		oldWarriorPosition = new Vector2(chars.get(Constants.WARRIOR).getX(), chars.get(Constants.WARRIOR).getY());
+		oldRoguePosition = new Vector2(chars.get(Constants.ROGUE).getX(), chars.get(Constants.ROGUE).getY());
 		
-		chars.get(MAGE).setXY(chars.get(MAGE).getBattleposition().x, chars.get(MAGE).getBattleposition().y);
-		chars.get(WARRIOR).setXY(chars.get(WARRIOR).getBattleposition().x, chars.get(WARRIOR).getBattleposition().y);
-		chars.get(ROGUE).setXY(chars.get(ROGUE).getBattleposition().x, chars.get(ROGUE).getBattleposition().y);	
+		chars.get(Constants.MAGE).setXY(chars.get(Constants.MAGE).getBattleposition().x, chars.get(Constants.MAGE).getBattleposition().y);
+		chars.get(Constants.WARRIOR).setXY(chars.get(Constants.WARRIOR).getBattleposition().x, chars.get(Constants.WARRIOR).getBattleposition().y);
+		chars.get(Constants.ROGUE).setXY(chars.get(Constants.ROGUE).getBattleposition().x, chars.get(Constants.ROGUE).getBattleposition().y);	
 	}
 	
 	@Override
@@ -204,19 +201,28 @@ public class Battle extends GameState {
 			if(enemyTarget.isAlive() && enemyTarget.getHp() < 0) {						//Check if playercharacter died
 				System.out.println(enemyTarget.getClass().getSimpleName() + "died!");
 				enemyTarget.setAlive(false);
-				deadPlayerCharacters++;
 			}
 			if(turnQueue.first().getX() < turnQueue.first().getBattleposition().x) {
 				turnQueue.first().move(dt);
 			} else {
 				resetAction();
-				if(deadPlayerCharacters == chars.size) {	//If all characters are dead 
+				if(allPlayerCharacters()) {	//If all characters are dead lose battle
 					System.out.println("YOU ARE DEAD!");
+					battleWon = false;
 					gsm.popState();
 				}
 			}
 		}
 		
+	}
+
+	private boolean allPlayerCharacters() {
+		for(Character c : chars) {
+			if(c.isAlive()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void handleAi() {
@@ -256,14 +262,24 @@ public class Battle extends GameState {
 				turnQueue.first().moveBackward(dt);
 			} else {
 				resetAction();
-				if(deadEnemies == enemies.size) {	//If all enemies are dead win battle
-					party.setBattleWon(true);
+				if(allEnemiesDead()) {	//If all enemies are dead win battle
+					battleWon = true;
 					gsm.popState();
+					System.out.println("YOU WON!");
 				}
 			}
 		}
 	}
 	
+	private boolean allEnemiesDead() {
+		for(Character c : enemies) {
+			if(c.isAlive()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private void resetAction() {
 		turnQueue.first().setMoving(false);
 		steppedForvard = false;
@@ -275,11 +291,11 @@ public class Battle extends GameState {
 	private void checkManaLeftAndDisableButtons(Character c) {
 		int index = 10;
 		if(c instanceof Warrior) {
-			index = WARRIOR;
+			index = Constants.WARRIOR;
 		} else if(c instanceof Rogue) {
-			index = ROGUE;
+			index = Constants.ROGUE;
 		} else if(c instanceof Mage) {
-			index = MAGE;
+			index = Constants.MAGE;
 		}
 		if(index != 10) {
 			for(TextButton b : attackbuttongroup.get(index).getButtons()) {
@@ -312,9 +328,9 @@ public class Battle extends GameState {
 		timeElapsed += dt;
 		if(WAIT_TIME <= timeElapsed) {
 			for(Character c : chars) {
-				if(c.isAlive()) {
+				if(c.isAlive()) {	//don't charge dead chars
 					c.addCharge();
-					if(c.isCharged()) {
+					if(c.isCharged()) {		//if charged add character to turnqueue
 						turnQueue.add(c);
 						System.out.println(c.getName()+" charged!");
 					}
@@ -392,20 +408,23 @@ public class Battle extends GameState {
 	public void dispose() {
 		stage.dispose();
 		skin.dispose();
-		assets.unload(BATTLEATLAS);
+		assets.unload(Constants.BATTLEATLAS);
 		resetCharacters();
 	}
 	
 	private void resetCharacters() {
-		chars.get(MAGE).setXY(oldMagePosition.x, oldMagePosition.y);
-		chars.get(WARRIOR).setXY(oldWarriorPosition.x, oldWarriorPosition.y);
-		chars.get(ROGUE).setXY(oldRoguePosition.x, oldRoguePosition.y);
+		chars.get(Constants.MAGE).setXY(oldMagePosition.x, oldMagePosition.y);
+		chars.get(Constants.WARRIOR).setXY(oldWarriorPosition.x, oldWarriorPosition.y);
+		chars.get(Constants.ROGUE).setXY(oldRoguePosition.x, oldRoguePosition.y);
 		for(Character c : chars) {
 			c.setAttackCharge(0);
 			c.setAttacking(false);
 		}
 	}
 	
+	public boolean isBattleWon() {
+		return battleWon;
+	}
 	
 	/* INITING BATTLE VARIABLES START */
 	
@@ -448,7 +467,7 @@ public class Battle extends GameState {
 				} 
 				tb.addListener(new SkillClickListener(tb, s, c));
 				bg.add(tb);
-				table.add(tb).width(mainButtonTable.getCells().get(0).getPrefWidth() * 0.5f).height(mainButtonTable.getCells().get(0).getPrefHeight() * 0.9f);
+				table.add(tb).width(mainButtonTable.getCells().get(0).getPrefWidth() * 0.5f).height((float) Math.ceil(mainButtonTable.getCells().get(0).getPrefHeight() * 0.9f));
 				table.row();
 				i++;
 			} //end of inner for
@@ -477,7 +496,7 @@ public class Battle extends GameState {
 				} 
 				tb.addListener(new SkillClickListener(tb, s, c));
 				bg.add(tb);
-				table.add(tb).width(mainButtonTable.getCells().get(0).getPrefWidth() * 0.5f).height(mainButtonTable.getCells().get(0).getPrefHeight() * 0.9f);
+				table.add(tb).width(mainButtonTable.getCells().get(0).getPrefWidth() * 0.5f).height((float) Math.ceil(mainButtonTable.getCells().get(0).getPrefHeight() * 0.9f));
 				table.row();
 				i++;
 			} //end of inner for
@@ -511,11 +530,11 @@ public class Battle extends GameState {
 	protected void setCharactersButtonsUnchecked(Character c) {
 		int index = 10;
 		if(c instanceof Warrior) {
-			index = WARRIOR;
+			index = Constants.WARRIOR;
 		} else if(c instanceof Rogue) {
-			index = ROGUE;
+			index = Constants.ROGUE;
 		} else if(c instanceof Mage) {
-			index = MAGE;
+			index = Constants.MAGE;
 		}
 		if(index != 10) {
 			if(mainbuttongroup.getChecked() != null) {
@@ -544,11 +563,11 @@ public class Battle extends GameState {
 					if(attackb.isChecked()) {	//check if click made button checked
 						hideExtraTables();
 						if(turnQueue.first() instanceof Warrior) {
-							showAttackTable(attackTables.get(WARRIOR));
+							showAttackTable(attackTables.get(Constants.WARRIOR));
 						} else if(turnQueue.first() instanceof Rogue) {
-							showAttackTable(attackTables.get(ROGUE));
+							showAttackTable(attackTables.get(Constants.ROGUE));
 						} else if(turnQueue.first() instanceof Mage) {
-							showAttackTable(attackTables.get(MAGE));
+							showAttackTable(attackTables.get(Constants.MAGE));
 						}
 					} else {
 						hideExtraTables();
@@ -565,11 +584,11 @@ public class Battle extends GameState {
 					if(castb.isChecked()) {  //check if click made button checked
 						hideExtraTables();
 						if(turnQueue.first() instanceof Warrior) {
-							showCastTable(castTables.get(WARRIOR));
+							showCastTable(castTables.get(Constants.WARRIOR));
 						} else if(turnQueue.first() instanceof Rogue) {
-							showCastTable(castTables.get(ROGUE));
+							showCastTable(castTables.get(Constants.ROGUE));
 						} else if(turnQueue.first() instanceof Mage) {
-							showCastTable(castTables.get(MAGE));
+							showCastTable(castTables.get(Constants.MAGE));
 						}
 					} else {
 						hideExtraTables();
@@ -604,14 +623,16 @@ public class Battle extends GameState {
 		mainbuttongroup.setMinCheckCount(0);
 		mainbuttongroup.setUncheckLast(true);
 		
-		mainButtonTable.columnDefaults(0).width(mastertable.getWidth() * 0.41f).fillY().expandY().top();
+		mainButtonTable.columnDefaults(0).width(mastertable.getWidth() * 0.41f).fillY().expandY().top().prefHeight((Gdx.graphics.getHeight() * 0.42f / 4f));
 		mainButtonTable.add(attackb);
 		mainButtonTable.row();
 		mainButtonTable.add(castb);
 		mainButtonTable.row();
 		mainButtonTable.add(itemb);
 		mainButtonTable.row();
-		mainButtonTable.add(runb);	
+		mainButtonTable.add(runb);
+		mainButtonTable.row().fillY().expandY();
+		
 	}
 	
 

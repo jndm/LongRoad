@@ -1,4 +1,4 @@
-package com.mygdx.game.helpers;
+package oldstuff;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;

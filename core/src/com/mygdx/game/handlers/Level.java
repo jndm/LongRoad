@@ -1,4 +1,4 @@
-package com.mygdx.game.helpers;
+package com.mygdx.game.handlers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -12,13 +12,14 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.ai.Ai;
 import com.mygdx.game.elements.ai.SkeletonAi;
-import com.mygdx.game.elements.characters.Skeleton;
 import com.mygdx.game.elements.skills.Skill;
 import com.mygdx.game.elements.skills.attacks.DefaultAttack;
 import com.mygdx.game.elements.skills.attacks.SpecialAttack;
 import com.mygdx.game.elements.skills.spells.DefaultSpell;
 import com.mygdx.game.elements.skills.spells.SpecialSpell;
 import com.mygdx.game.elements.characters.Character;
+import com.mygdx.game.elements.characters.Skeleton;
+import com.mygdx.game.helpers.Utils;
 
 public class Level {
 
@@ -64,7 +65,7 @@ public class Level {
 			Skeleton s;
 			Array<Character> enemies = new Array<Character>();
 			if(i < 17) { 
-				s = new Skeleton((int)((i+1) * Game.VIRTUAL_WIDTH * 0.825), (int)(Game.VIRTUAL_HEIGHT * 0.18), 10f, 120f, 20f, 4, 10, 12, skeletonAi);
+				s = new Skeleton((int)((i+1) * Game.VIRTUAL_WIDTH * 0.825), (int)(Game.VIRTUAL_HEIGHT * 0.18), 10f, 120f, 50f, 10000, 10, 12, skeletonAi);
 				s.setTextureRegion(enemyAtlas.findRegion(SKELETON_IMG));
 				s.setBattleposition(new Vector2((int)(Game.VIRTUAL_WIDTH * 0.825), (int)(Game.VIRTUAL_HEIGHT * 0.63)));
 				enemies.add(s);
@@ -151,7 +152,7 @@ public class Level {
 	
 	public void dispose() {
 		assets.unload(BACKGROUND_IMG);
-		assets.unload(SKELETON_IMG);
+		assets.unload(ENEMYATLAS);
 	}
 
 	public Array<Array<Character>> getEnemywaves() {
@@ -161,6 +162,6 @@ public class Level {
 	public void removeEnemyWave() {
 		enemywaves.removeIndex(0);
 		ENEMYWAWES--;
-	}	
+	}
 	
 }

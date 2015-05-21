@@ -18,8 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.elements.characters.Character;
-import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.handlers.GameStateManager;
+import com.mygdx.game.handlers.Party;
 import com.mygdx.game.helpers.InventoryTable;
 
 public class Menu extends GameState {

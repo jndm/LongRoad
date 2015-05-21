@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Game;
-import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.handlers.GameStateManager;
+import com.mygdx.game.handlers.Party;
 
 public abstract class GameState {
 	

@@ -2,15 +2,15 @@ package com.mygdx.game.handlers;
 
 import java.util.Stack;
 
+import oldstuff.OldBattle;
+
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Game;
 import com.mygdx.game.elements.characters.Character;
-import com.mygdx.game.elements.characters.Party;
 import com.mygdx.game.states.Battle;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.MainMenu;
 import com.mygdx.game.states.Menu;
-import com.mygdx.game.states.OldBattle;
 import com.mygdx.game.states.Play;
 
 public class GameStateManager {
@@ -29,23 +29,21 @@ public class GameStateManager {
 		gameStates = new Stack<GameState>();
 		pushMainMenuState();
 	}
+
+	public Game game() { return game; }
+	
+	//Updating
+	public void update(float dt) { gameStates.peek().update(dt); }
+	//Rendering
+	public void render() { gameStates.peek().render(); }
+	//Resizing
+	public void resize(int w, int h) { gameStates.peek().resize(w, h); }
 	
 	public void pushMainMenuState() {
 		gameStates.push(new MainMenu(this));
 	}
-
-	public Game game() { return game; }
-	
-	public void update(float dt) {
-		gameStates.peek().update(dt);
-	}
-	
-	public void render() {
-		gameStates.peek().render();
-	}
-	
-	public void pushBattleState(int state, Array<Character> array) {
-		gameStates.push(new Battle(this, array)); 
+	public void pushBattleState(Battle battle) {
+		gameStates.push(battle); 
 	}
 	
 	public void pushMenuState(int state) {
@@ -56,16 +54,15 @@ public class GameStateManager {
 		gameStates.push(new Play(this));
 	}
 	
+	public void returnMainMenuState() {
+		while(!gameStates.isEmpty()){
+			popState();
+		};
+		pushMainMenuState();
+	}
+	
 	public void popState() {
 		GameState g = gameStates.pop();
 		g.dispose();
-	}
-	
-	public GameState peekState() {
-		return gameStates.peek();
-	}
-	
-	public void resize(int w, int h) {
-		gameStates.peek().resize(w, h);
 	}
 }

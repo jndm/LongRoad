@@ -213,6 +213,5 @@ public abstract class Character {
 			elapsedTime = 0;
 		}
 		this.moving = moving; 
-	}
-		
+	}	
 }
